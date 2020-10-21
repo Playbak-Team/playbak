@@ -6,6 +6,9 @@ import './app.global.css';
 
 const store = configuredStore();
 
+// eslint-disable-next-line no-console
+// console.log(store);
+
 const AppContainer = process.env.PLAIN_HMR ? Fragment : ReactHotAppContainer;
 
 document.addEventListener('DOMContentLoaded', () => {

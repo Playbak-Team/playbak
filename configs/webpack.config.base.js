@@ -21,6 +21,14 @@ export default {
           },
         },
       },
+      {
+        test: /\.mp4$/,
+        loader: 'file-loader',
+      },
+      {
+        test: /\.txt$/,
+        use: 'raw-loader',
+      },
     ],
   },
 
