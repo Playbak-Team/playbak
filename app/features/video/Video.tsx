@@ -11,7 +11,21 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import { getCurrentVideo, getPathURLS, setVideo } from './videoSlice';
+import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
+import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
+import TextField from '@material-ui/core/TextField';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import {
+  getCurrentVideo,
+  getPathURLS,
+  setVideo,
+  addToURLS,
+  isSnackBarActive,
+  getSnackBarMessage,
+  disableSnackbar,
+  getSnackBarSeverity,
+} from './videoSlice';
 import routes from '../../constants/routes.json';
 
 import styles from './Video.css';
@@ -75,8 +89,21 @@ const useStyles = makeStyles((theme: Theme) =>
     selection: {
       justifyContent: 'center',
     },
+    inputtextclosed: {
+      height: '0px',
+    },
+    inputtextopen: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      margin: theme.spacing(1),
+    },
   })
 );
+
+function Alert(props: AlertProps) {
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
   const classes = useStyles();
@@ -112,7 +139,11 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
 
   useEffect(() => {
     fs.readdir(dir, (err, found) => {
-      found.forEach((f) => setFiles((old) => [...old, f]));
+      found.forEach((f) => {
+        if (f.endsWith('.mp4')) {
+          setFiles((old) => [...old, f]);
+        }
+      });
     });
   }, []);
 
@@ -149,10 +180,16 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
 }
 
 export default function Video() {
+  const dispatch = useDispatch();
   const paths = useSelector(getPathURLS);
   const curVideo = useSelector(getCurrentVideo);
+  const snackbar = useSelector(isSnackBarActive);
+  const snackbarMessage = useSelector(getSnackBarMessage);
+  const severity = useSelector(getSnackBarSeverity);
   const classes = useStyles();
   const [menuExpanded, setMenuExpanded] = useState<boolean>(true);
+  const [showAdd, setShowAdd] = useState<boolean>(false);
+  const [pathToAdd, setPathToAdd] = useState<string>('');
 
   return (
     <div className={classes.root}>
@@ -169,8 +206,16 @@ export default function Video() {
             {menuExpanded ? (
               <div>
                 <div className={classes.selectiontop}>
-                  <IconButton color="primary" aria-label="Select">
-                    <AddCircleOutlineIcon />
+                  <IconButton
+                    color="primary"
+                    aria-label="Select"
+                    onClick={() => setShowAdd(!showAdd)}
+                  >
+                    {showAdd ? (
+                      <RemoveCircleOutlineIcon />
+                    ) : (
+                      <AddCircleOutlineIcon />
+                    )}
                   </IconButton>
                   <IconButton
                     color="primary"
@@ -180,6 +225,35 @@ export default function Video() {
                     <ChevronLeftIcon />
                   </IconButton>
                 </div>
+                {showAdd ? (
+                  <div
+                    style={{
+                      marginBottom: '10px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <TextField
+                      id="outlined-basic"
+                      label="Enter path"
+                      variant="outlined"
+                      style={{
+                        width: '100%',
+                      }}
+                      value={pathToAdd}
+                      onChange={(e) => setPathToAdd(e.target.value)}
+                    />
+                    <IconButton
+                      color="primary"
+                      aria-label="Select"
+                      onClick={() => dispatch(addToURLS(pathToAdd))}
+                    >
+                      <CreateNewFolderIcon />
+                    </IconButton>
+                  </div>
+                ) : (
+                  <div className={styles.inputtextclosed} />
+                )}
                 {paths.map((dir: string) => (
                   <MyCollapsible key={dir} dir={dir} />
                 ))}
@@ -201,6 +275,22 @@ export default function Video() {
           </Paper>
         </Grid>
       </Grid>
+      <Snackbar
+        open={snackbar}
+        autoHideDuration={1000}
+        onClose={() => {
+          dispatch(disableSnackbar());
+        }}
+        key={`${snackbarMessage}-bar`}
+      >
+        <Alert
+          key={`${snackbarMessage}-alert`}
+          onClose={() => dispatch(disableSnackbar())}
+          severity={severity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
