@@ -45,3 +45,5 @@ export const { addToURLS, setVideo } = videoSlice.actions;
 export default videoSlice.reducer;
 
 export const getPathURLS = (state: RootState) => state.video.videoURLS;
+
+export const getCurrentVideo = (state: RootState) => state.video.currentVideo;
