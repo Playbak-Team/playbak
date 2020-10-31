@@ -13,7 +13,11 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
+import Collapse from '@material-ui/core/Collapse';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import {
@@ -81,6 +85,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
+      wordWrap: 'break-word',
     },
     selectiontop: {
       display: 'flex',
@@ -96,6 +101,9 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'space-between',
       margin: theme.spacing(1),
+    },
+    title: {
+      flexGrow: 1,
     },
   })
 );
@@ -138,7 +146,7 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
   const [files, setFiles] = useState<string[]>([]);
 
   useEffect(() => {
-    fs.readdir(dir, (err, found) => {
+    fs.readdir(dir, (_err, found) => {
       found.forEach((f) => {
         if (f.endsWith('.mp4')) {
           setFiles((old) => [...old, f]);
@@ -193,13 +201,20 @@ export default function Video() {
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={3}>
+      <Grid container spacing={1}>
         <Grid item xs={12}>
-          <Paper className={classes.paper}>
+          {/* <Paper className={classes.paper}>
             <Link to={routes.HOME}>
               <div className={classes.previous}>&#8249;</div>
             </Link>
-          </Paper>
+          </Paper> */}
+          <AppBar position="static">
+            <Toolbar>
+              <Link to={routes.HOME}>
+                <div className={classes.previous}>&#8249;</div>
+              </Link>
+            </Toolbar>
+          </AppBar>
         </Grid>
         <Grid item xs={menuExpanded ? 3 : 1}>
           <Paper className={`${classes.paper} ${classes.selection}`}>
@@ -225,7 +240,7 @@ export default function Video() {
                     <ChevronLeftIcon />
                   </IconButton>
                 </div>
-                {showAdd ? (
+                <Collapse in={showAdd}>
                   <div
                     style={{
                       marginBottom: '10px',
@@ -251,9 +266,8 @@ export default function Video() {
                       <CreateNewFolderIcon />
                     </IconButton>
                   </div>
-                ) : (
-                  <div className={styles.inputtextclosed} />
-                )}
+                </Collapse>
+
                 {paths.map((dir: string) => (
                   <MyCollapsible key={dir} dir={dir} />
                 ))}
@@ -271,6 +285,7 @@ export default function Video() {
         </Grid>
         <Grid item xs={menuExpanded ? 9 : 11}>
           <Paper className={classes.videocontainer}>
+            {curVideo}
             <VideoPlayer filepath={curVideo} />
           </Paper>
         </Grid>

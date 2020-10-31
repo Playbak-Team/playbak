@@ -68,6 +68,10 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    minWidth: 1024,
+    minHeight: 728,
+    backgroundColor: '#202225',
+    darkTheme: true,
     icon: getAssetPath('icon.png'),
     webPreferences:
       (process.env.NODE_ENV === 'development' ||
@@ -103,6 +107,8 @@ const createWindow = async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
+
+  mainWindow.removeMenu();
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

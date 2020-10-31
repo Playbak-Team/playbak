@@ -286,6 +286,7 @@
     "electron-log": "^4.2.4",
     "electron-updater": "^4.3.4",
     "history": "^4.7.2",
+    "nedb-promises": "^4.1.0",
     "react": "^16.13.1",
     "react-collapsible": "^2.8.1",
     "react-dom": "^16.12.0",

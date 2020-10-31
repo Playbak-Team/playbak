@@ -14,6 +14,14 @@ const initialState: VideoStateInterface = {
   snackbarSeverity: undefined,
 };
 
+// 1. Create a workspace (ie. F20, W21)
+// 2. Create a course
+// - Name
+// - Create a directory with
+// - Videos, Assignments, Notes, Others folders
+// - maybe can add cache of some sort here as well
+// 3. Select a workspace
+
 const videoSlice = createSlice({
   name: 'video',
   initialState,
