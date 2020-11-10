@@ -3,5 +3,6 @@
   "COUNTER": "/counter",
   "VIDEO": "/video",
   "CALENDAR": "/calendar",
-  "KANBAN": "/kanban"
+  "KANBAN": "/kanban",
+  "PROFILE": "/profile"
 }

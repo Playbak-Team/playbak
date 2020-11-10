@@ -1,70 +1,71 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-cycle
-import { AppThunk, RootState } from '../../store';
-import { VideoStateInterface } from '../../interfaces';
+import path from 'path';
+// eslint-disable-next-line import/no-cycle
+import { RootState } from '../../store';
+import { ProfileStateInterface } from '../../interfaces';
 
-const initialState: VideoStateInterface = {
-  videoURLS: [
-    'C:\\Users\\kevin\\Desktop\\cs341lectures',
-    'C:\\Users\\kevin\\Desktop\\cs349lectures',
-  ],
-  currentVideo: '',
-  snackbarActive: false,
-  snackbarMessage: '',
-  snackbarSeverity: undefined,
+const Datastore = require('nedb-promises');
+
+const workSpacesDB = new Datastore({
+  filename: '../../db/stores/workspaces.db',
+});
+
+const initialState: ProfileStateInterface = {
+  selectedWorkspace: 'F20',
+  availableWorkspaces: [],
+  courses: [],
+  links: [],
 };
 
-// 1. Create a workspace (ie. F20, W21)
-// 2. Create a course
-// - Name
-// - Create a directory with
-// - Videos, Assignments, Notes, Others folders
-// - maybe can add cache of some sort here as well
-// 3. Select a workspace
-
-const videoSlice = createSlice({
-  name: 'video',
+const profileSlice = createSlice({
+  name: 'profile',
   initialState,
   reducers: {
-    disableSnackbar: (state) => {
-      state.snackbarActive = false;
+    setWorkspace: (state, action: PayloadAction<string>) => {
+      state.selectedWorkspace = action.payload;
     },
-    addToURLS: (state, action: PayloadAction<string>) => {
-      if (!state.videoURLS.includes(action.payload) && action.payload !== '') {
-        state.videoURLS.push(action.payload);
-        state.snackbarMessage = `Added ${action.payload} to paths`;
-        state.snackbarSeverity = 'success';
-      } else if (state.videoURLS.includes(action.payload)) {
-        state.snackbarMessage = 'Path already exists';
-        state.snackbarSeverity = 'error';
-      } else if (action.payload === '') {
-        state.snackbarMessage = 'Cannot add an empty path';
-        state.snackbarSeverity = 'error';
-      }
-      state.snackbarActive = true;
+    setAvailableWorkspaces: (state, action: PayloadAction<string[]>) => {
+      state.availableWorkspaces = action.payload;
     },
-    setVideo: (state, action: PayloadAction<string>) => {
-      state.currentVideo = action.payload;
-      state.snackbarActive = true;
-      state.snackbarMessage = `Video set to ${action.payload}`;
-      state.snackbarSeverity = 'success';
+    addCourse: (state, action: PayloadAction<string[]>) => {
+      state.courses.push(action.payload[0]);
+      state.links.push(action.payload[1]);
+      workSpacesDB.update(
+        { term: state.selectedWorkspace },
+        { $set: { courses: state.courses, links: state.links } }
+      );
     },
   },
 });
 
-export const { addToURLS, setVideo, disableSnackbar } = videoSlice.actions;
+export const {
+  addCourse,
+  setAvailableWorkspaces,
+  setWorkspace,
+} = profileSlice.actions;
 
-export default videoSlice.reducer;
+export default profileSlice.reducer;
 
-export const getPathURLS = (state: RootState) => state.video.videoURLS;
+export const getCurrentTerm = (state: RootState) =>
+  state.profile.selectedWorkspace;
 
-export const getCurrentVideo = (state: RootState) => state.video.currentVideo;
+export const getCurrentCourses = (state: RootState) => state.profile.courses;
 
-export const isSnackBarActive = (state: RootState) =>
-  state.video.snackbarActive;
+export const getCurrentCoursesLinks = (state: RootState) => state.profile.links;
 
-export const getSnackBarMessage = (state: RootState) =>
-  state.video.snackbarMessage;
+export const getAllWorkspaces = (state: RootState) =>
+  state.profile.availableWorkspaces;
 
-export const getSnackBarSeverity = (state: RootState) =>
-  state.video.snackbarSeverity;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const loadDBData = () => async (dispatch: (arg0: any) => void) => {
+  const db = await new Datastore({
+    filename: 'C:\\Users\\kevin\\Desktop\\random\\nedb\\workspaces.db',
+    autoload: true,
+  });
+  console.log(db);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const x = await db.find({});
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  console.log(x);
+};

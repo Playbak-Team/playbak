@@ -17,7 +17,7 @@ import MailIcon from '@material-ui/icons/Mail';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import routes from '../../constants/routes.json';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -90,6 +90,8 @@ export default function PrimarySearchAppBar() {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
+  const history = useHistory();
+
   const isMenuOpen = Boolean(anchorEl);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -98,6 +100,11 @@ export default function PrimarySearchAppBar() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleAccountClick = () => {
+    setAnchorEl(null);
+    history.push('/profile');
   };
 
   const menuId = 'primary-search-account-menu';
@@ -111,7 +118,7 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleAccountClick}>My account</MenuItem>
     </Menu>
   );
 

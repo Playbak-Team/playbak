@@ -16,6 +16,14 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 
+// const Datastore = require('nedb-promises');
+
+// const workSpacesDB = new Datastore({ filename: '../db/stores/workspaces.db' });
+
+// const getWorkspace = async (termToFind: string) => {
+//   return workSpacesDB.find({ term: termToFind });
+// };
+
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
