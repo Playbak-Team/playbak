@@ -7,6 +7,8 @@ import counterReducer from './features/counter/counterSlice';
 import videoReducer from './features/video/videoSlice';
 // eslint-disable-next-line import/no-cycle
 import profileReducer from './features/profile/profileSlice';
+// eslint-disable-next-line import/no-cycle
+import dbReducer from './dbSlice';
 
 export default function createRootReducer(history: History) {
   return combineReducers({
@@ -14,5 +16,6 @@ export default function createRootReducer(history: History) {
     video: videoReducer,
     profile: profileReducer,
     counter: counterReducer,
+    dbinfo: dbReducer,
   });
 }

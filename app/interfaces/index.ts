@@ -13,5 +13,11 @@ interface ProfileStateInterface {
   links: string[];
 }
 
+interface UserInfoInterace {
+  name: string;
+  LST: string;
+  LL: string;
+}
+
 // eslint-disable-next-line import/prefer-default-export
-export { VideoStateInterface, ProfileStateInterface };
+export { VideoStateInterface, ProfileStateInterface, UserInfoInterace };

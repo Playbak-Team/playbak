@@ -11,4 +11,8 @@ type VideoPlayerProps = {
   filepath: string;
 };
 
-export { CollapsibleProps, CollapsibleCardProps, VideoPlayerProps };
+type HomeProps = {
+  name: string;
+};
+
+export { CollapsibleProps, CollapsibleCardProps, VideoPlayerProps, HomeProps };

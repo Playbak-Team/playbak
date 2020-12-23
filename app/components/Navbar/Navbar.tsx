@@ -83,6 +83,9 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'none',
       },
     },
+    navbarStyle: {
+      backgroundColor: '#323639',
+    },
   })
 );
 
@@ -124,7 +127,11 @@ export default function PrimarySearchAppBar() {
 
   return (
     <div className={classes.grow}>
-      <AppBar position="static" color="transparent">
+      <AppBar
+        position="static"
+        color="transparent"
+        className={classes.navbarStyle}
+      >
         <Toolbar>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
@@ -145,7 +152,7 @@ export default function PrimarySearchAppBar() {
               </Badge>
             </IconButton>
             <IconButton aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={0} color="secondary">
+              <Badge badgeContent={0} color="secondary" variant="dot">
                 <NotificationsIcon />
               </Badge>
             </IconButton>

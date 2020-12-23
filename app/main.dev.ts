@@ -11,18 +11,46 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import installExtension, {
+  REDUX_DEVTOOLS,
+  REACT_DEVELOPER_TOOLS,
+} from 'electron-devtools-installer';
 import MenuBuilder from './menu';
 
-// const Datastore = require('nedb-promises');
+const fs = require('fs');
 
-// const workSpacesDB = new Datastore({ filename: '../db/stores/workspaces.db' });
+ipcMain.on('create-new-workspace', async (event, name: string) => {
+  if (!fs.existsSync(`./workspaces/${name}`)) {
+    fs.mkdir(`./workspaces/${name}`);
+    fs.open('mynewfile2.txt', 'w', (err: Error | null) => {
+      if (err) throw err;
+    });
+    event.reply('created-workspace', name);
+  }
+});
 
-// const getWorkspace = async (termToFind: string) => {
-//   return workSpacesDB.find({ term: termToFind });
-// };
+ipcMain.on('create-new-course', async (event, name: string) => {
+  const wkspace = name.split('=')[0];
+  const coursename = name.split('=')[1];
+
+  const dirname = `./workspaces/${wkspace}/${coursename}`;
+
+  if (!fs.existsSync(dirname)) {
+    fs.mkdir(dirname);
+
+    if (!fs.existsSync(`${dirname}/pdfs`)) fs.mkdir(`${dirname}/pdfs`);
+
+    if (!fs.existsSync(`${dirname}/videos`)) fs.mkdir(`${dirname}/videos`);
+
+    if (!fs.existsSync(`${dirname}/assignments`))
+      fs.mkdir(`${dirname}/assignments`);
+
+    event.reply('created-course', coursename);
+  }
+});
 
 export default class AppUpdater {
   constructor() {
@@ -87,6 +115,7 @@ const createWindow = async () => {
       process.env.ERB_SECURE !== 'true'
         ? {
             nodeIntegration: true,
+            enableRemoteModule: true,
           }
         : {
             preload: path.join(__dirname, 'dist/renderer.prod.js'),
@@ -137,7 +166,12 @@ app.on('window-all-closed', () => {
 
 if (process.env.E2E_BUILD === 'true') {
   // eslint-disable-next-line promise/catch-or-return
-  app.whenReady().then(createWindow);
+  app.whenReady().then(async () => {
+    // eslint-disable-next-line promise/no-nesting
+    await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS]);
+
+    return createWindow();
+  });
 } else {
   app.on('ready', createWindow);
 }
