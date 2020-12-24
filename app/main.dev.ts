@@ -18,9 +18,21 @@ import installExtension, {
   REDUX_DEVTOOLS,
   REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer';
+import writeJsonFile from 'write-json-file';
 import MenuBuilder from './menu';
 
 const fs = require('fs');
+
+interface Settings {
+  name: string;
+  LST: string;
+  LL: string;
+  AWKS: string[];
+}
+
+ipcMain.on('save-settings', async (_event, settings: Settings) => {
+  await writeJsonFile('./db/stores/settings.json', settings);
+});
 
 ipcMain.on('create-new-workspace', async (event, name: string) => {
   if (!fs.existsSync(`./workspaces/${name}`)) {

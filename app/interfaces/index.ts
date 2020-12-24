@@ -7,17 +7,12 @@ interface VideoStateInterface {
 }
 
 interface ProfileStateInterface {
+  name: string;
   selectedWorkspace: string;
   availableWorkspaces: string[];
   courses: string[];
   links: string[];
 }
 
-interface UserInfoInterace {
-  name: string;
-  LST: string;
-  LL: string;
-}
-
 // eslint-disable-next-line import/prefer-default-export
-export { VideoStateInterface, ProfileStateInterface, UserInfoInterace };
+export { VideoStateInterface, ProfileStateInterface };

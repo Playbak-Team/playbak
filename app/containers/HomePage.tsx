@@ -3,19 +3,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import Home from '../components/Home/Home';
 import Navbar from '../components/Navbar/Navbar';
 import Loader from '../components/Loader/Loader';
-import { getName, getLST } from '../dbSlice';
-import { setWorkspace } from '../features/profile/profileSlice';
+import { getName } from '../features/profile/profileSlice';
 
 export default function HomePage() {
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const name = useSelector(getName);
-  const LST = useSelector(getLST);
 
-  useEffect(() => {
-    dispatch(setWorkspace(LST));
-    setLoading(false);
-  }, [LST, dispatch]);
+  // useEffect(() => {
+  //   dispatch(setWorkspace(LST));
+  //   setLoading(false);
+  // }, [LST, dispatch]);
 
   return (
     <div>

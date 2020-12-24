@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import {
+  makeStyles,
+  createStyles,
+  Theme,
+  withStyles,
+} from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import IconButton from '@material-ui/core/IconButton';
 import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from '@material-ui/icons/Edit';
-import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
-import { getName, setName } from '../../dbSlice';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import {
+  getCurrentTerm,
+  setName,
+  getName,
+  getAllWorkspaces,
+} from './profileSlice';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,20 +34,75 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: '90vh',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
     },
     row: {
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'center',
     },
+    namerow: {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderBottom: '3px solid black',
+    },
+    termrow: {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      marginTop: '3vh',
+      borderBottom: '3px solid black',
+      paddingBottom: '3vh',
+    },
+    workspacesdiv: {
+      marginTop: '1vh',
+      width: '100%',
+      color: 'white',
+      minHeight: '50vh',
+      maxHeight: '50vh',
+      overflowY: 'scroll',
+      textAlign: 'left',
+    },
+    workspacestitle: {
+      display: 'flex',
+      flexDirection: 'row',
+      marginTop: '2vh',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
   })
 );
+
+const CssTextField = withStyles({
+  root: {
+    '& label.Mui-focused': {
+      color: 'white',
+    },
+    '& .MuiInput-underline:after': {
+      borderBottomColor: 'yellow',
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: 'white',
+      },
+      '&:hover fieldset': {
+        borderColor: 'white',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: 'yellow',
+      },
+    },
+    color: 'white',
+  },
+})(TextField);
 
 export default function Profile() {
   const [editingName, setEditingName] = useState(false);
   const classes = useStyles();
   const name = useSelector(getName);
+  const allWorkspaces = useSelector(getAllWorkspaces);
+  const currentTerm = useSelector(getCurrentTerm);
   const [nameChange, setNameChange] = useState('');
   // const wkspace = useSelector(getCurrentTerm);
   const dispatch = useDispatch();
@@ -47,16 +112,15 @@ export default function Profile() {
       <Grid container spacing={3}>
         <Grid item xs={3}>
           <div className={classes.paper}>
-            <AccountBoxIcon style={{ fontSize: 100 }} />
-            <div className={classes.row}>
+            <div className={classes.namerow}>
+              <AccountBoxIcon style={{ fontSize: 100 }} />
               {editingName ? (
                 <div>
-                  <TextField
+                  <CssTextField
                     id="new-name-field"
                     label="Enter new name"
                     defaultValue={name}
                     variant="outlined"
-                    color="primary"
                     onChange={(e) => setNameChange(e.target.value)}
                     value={nameChange}
                   />
@@ -87,11 +151,36 @@ export default function Profile() {
                 </div>
               )}
             </div>
+            <div className={classes.termrow}>
+              Current Selected Term:
+              {currentTerm === '' ? (
+                <div>&nbsp;NONE</div>
+              ) : (
+                <div>
+                  &nbsp;
+                  {currentTerm}
+                </div>
+              )}
+            </div>
+            <div className={classes.workspacestitle}>
+              Available Workspaces
+              <IconButton>
+                <AddCircleIcon
+                  style={{
+                    marginTop: 0,
+                    marginBottom: 0,
+                    color: 'white',
+                    alignSelf: 'flex-end',
+                  }}
+                />
+              </IconButton>
+            </div>
+            <div className={classes.workspacesdiv}>wow no way</div>
           </div>
         </Grid>
-        <Grid item xs={9}>
+        {/* <Grid item xs={9}>
           <Paper className={classes.paper}>potato</Paper>
-        </Grid>
+        </Grid> */}
       </Grid>
     </div>
   );
