@@ -1,5 +1,8 @@
 {
   "HOME": "/",
   "COUNTER": "/counter",
-  "VIDEO": "/video"
+  "VIDEO": "/video",
+  "CALENDAR": "/calendar",
+  "KANBAN": "/kanban",
+  "PROFILE": "/profile"
 }

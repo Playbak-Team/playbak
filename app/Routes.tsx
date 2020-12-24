@@ -5,6 +5,7 @@ import routes from './constants/routes.json';
 import App from './containers/App';
 import HomePage from './containers/HomePage';
 import VideoPage from './containers/VideoPage';
+import ProfilePage from './containers/ProfilePage';
 
 // Lazily load routes and code split with webpack
 const LazyCounterPage = React.lazy(() =>
@@ -22,6 +23,7 @@ export default function Routes() {
     <App>
       <Switch>
         <Route path={routes.VIDEO} component={VideoPage} />
+        <Route path={routes.PROFILE} component={ProfilePage} />
         <Route path={routes.COUNTER} component={CounterPage} />
         <Route path={routes.HOME} component={HomePage} />
       </Switch>

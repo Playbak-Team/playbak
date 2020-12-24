@@ -5,11 +5,14 @@ import { History } from 'history';
 import counterReducer from './features/counter/counterSlice';
 // eslint-disable-next-line import/no-cycle
 import videoReducer from './features/video/videoSlice';
+// eslint-disable-next-line import/no-cycle
+import profileReducer from './features/profile/profileSlice';
 
 export default function createRootReducer(history: History) {
   return combineReducers({
     router: connectRouter(history),
     video: videoReducer,
+    profile: profileReducer,
     counter: counterReducer,
   });
 }

@@ -11,10 +11,117 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import installExtension, {
+  REDUX_DEVTOOLS,
+  REACT_DEVELOPER_TOOLS,
+} from 'electron-devtools-installer';
+import writeJsonFile from 'write-json-file';
 import MenuBuilder from './menu';
+
+const fs = require('fs');
+
+interface Settings {
+  name: string;
+  LST: string;
+  LL: string;
+  AWKS: string[];
+}
+
+ipcMain.on('save-settings', async (_event, settings: Settings) => {
+  await writeJsonFile('./db/stores/settings.json', settings);
+});
+
+ipcMain.on('get-courses', async (event, wkspace: string) => {
+  fs.readFile(
+    `./workspaces/${wkspace}/${wkspace}-settings.json`,
+    async (err: Error | null, data: string) => {
+      if (err) throw err;
+
+      const settings = JSON.parse(data);
+
+      event.reply('return-courses', settings.courses);
+    }
+  );
+});
+
+ipcMain.on('create-new-workspace', async (event, name: string) => {
+  if (!fs.existsSync(`./workspaces`)) {
+    await fs.mkdir(`./workspaces`, (err: Error | null, _data: any) => {
+      if (err) throw err;
+    });
+  }
+
+  if (!fs.existsSync(`./workspaces/${name}`)) {
+    await fs.mkdir(`./workspaces/${name}`, (err: Error | null, _data: any) => {
+      if (err) throw err;
+    });
+    // await fs.open(
+    //   `./workspaces/${name}/${name}-settings.json`,
+    //   'w',
+    //   (err: Error | null, _data: any) => {
+    //     if (err) throw err;
+    //   }
+    // );
+    await writeJsonFile(`./workspaces/${name}/${name}-settings.json`, {
+      courses: [],
+    });
+    event.reply('created-workspace', name);
+  }
+});
+
+ipcMain.on('create-new-course', async (event, name: string) => {
+  const wkspace = name.split('=')[0];
+  const coursename = name.split('=')[1];
+
+  const dirname = `./workspaces/${wkspace}/${coursename}`;
+  const settingsdir = `./workspaces/${wkspace}/${wkspace}-settings.json`;
+
+  if (!fs.existsSync(dirname)) {
+    fs.mkdir(dirname, (err: Error | null) => {
+      if (err) throw err;
+    });
+
+    if (!fs.existsSync(`${dirname}/pdfs`))
+      fs.mkdir(`${dirname}/pdfs`, (err: Error | null) => {
+        if (err) throw err;
+      });
+
+    if (!fs.existsSync(`${dirname}/videos`))
+      fs.mkdir(`${dirname}/videos`, (err: Error | null) => {
+        if (err) throw err;
+      });
+
+    if (!fs.existsSync(`${dirname}/assignments`))
+      fs.mkdir(`${dirname}/assignments`, (err: Error | null) => {
+        if (err) throw err;
+      });
+
+    fs.readFile(
+      `./workspaces/${wkspace}/${wkspace}-settings.json`,
+      async (err: Error | null, data: string) => {
+        if (err) throw err;
+
+        const settings = JSON.parse(data);
+
+        const newSettings = {
+          courses: Object.values(settings.courses),
+        };
+
+        newSettings.courses.push(coursename);
+
+        await writeJsonFile(
+          `./workspaces/${wkspace}/${wkspace}-settings.json`,
+          newSettings
+        );
+      }
+    );
+
+    event.reply('created-course', coursename);
+  }
+});
 
 export default class AppUpdater {
   constructor() {
@@ -68,6 +175,10 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    minWidth: 1024,
+    minHeight: 728,
+    backgroundColor: '#202225',
+    darkTheme: true,
     icon: getAssetPath('icon.png'),
     webPreferences:
       (process.env.NODE_ENV === 'development' ||
@@ -75,6 +186,7 @@ const createWindow = async () => {
       process.env.ERB_SECURE !== 'true'
         ? {
             nodeIntegration: true,
+            enableRemoteModule: true,
           }
         : {
             preload: path.join(__dirname, 'dist/renderer.prod.js'),
@@ -104,6 +216,8 @@ const createWindow = async () => {
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 
+  mainWindow.removeMenu();
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -123,7 +237,12 @@ app.on('window-all-closed', () => {
 
 if (process.env.E2E_BUILD === 'true') {
   // eslint-disable-next-line promise/catch-or-return
-  app.whenReady().then(createWindow);
+  app.whenReady().then(async () => {
+    // eslint-disable-next-line promise/no-nesting
+    await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS]);
+
+    return createWindow();
+  });
 } else {
   app.on('ready', createWindow);
 }

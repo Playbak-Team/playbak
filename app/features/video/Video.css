@@ -13,11 +13,13 @@ input[type='checkbox'] {
   font-size: 1.2rem;
   text-transform: uppercase;
   text-align: center;
+  word-wrap: break-word;
   padding: 1rem;
-  color: #a77b0e;
+  color: black;
   background: #fae042;
   cursor: pointer;
   border-radius: 7px;
+  border: 1px solid black;
   transition: all 0.25s ease-out;
 }
 
