@@ -15,7 +15,6 @@ import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Collapse from '@material-ui/core/Collapse';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -50,6 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       flexGrow: 1,
       overflowX: 'hidden',
+      overflowY: 'hidden',
       height: '100vh',
     },
     paper: {

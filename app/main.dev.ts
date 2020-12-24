@@ -34,11 +34,39 @@ ipcMain.on('save-settings', async (_event, settings: Settings) => {
   await writeJsonFile('./db/stores/settings.json', settings);
 });
 
-ipcMain.on('create-new-workspace', async (event, name: string) => {
-  if (!fs.existsSync(`./workspaces/${name}`)) {
-    fs.mkdir(`./workspaces/${name}`);
-    fs.open('mynewfile2.txt', 'w', (err: Error | null) => {
+ipcMain.on('get-courses', async (event, wkspace: string) => {
+  fs.readFile(
+    `./workspaces/${wkspace}/${wkspace}-settings.json`,
+    async (err: Error | null, data: string) => {
       if (err) throw err;
+
+      const settings = JSON.parse(data);
+
+      event.reply('return-courses', settings.courses);
+    }
+  );
+});
+
+ipcMain.on('create-new-workspace', async (event, name: string) => {
+  if (!fs.existsSync(`./workspaces`)) {
+    await fs.mkdir(`./workspaces`, (err: Error | null, _data: any) => {
+      if (err) throw err;
+    });
+  }
+
+  if (!fs.existsSync(`./workspaces/${name}`)) {
+    await fs.mkdir(`./workspaces/${name}`, (err: Error | null, _data: any) => {
+      if (err) throw err;
+    });
+    // await fs.open(
+    //   `./workspaces/${name}/${name}-settings.json`,
+    //   'w',
+    //   (err: Error | null, _data: any) => {
+    //     if (err) throw err;
+    //   }
+    // );
+    await writeJsonFile(`./workspaces/${name}/${name}-settings.json`, {
+      courses: [],
     });
     event.reply('created-workspace', name);
   }
@@ -49,16 +77,47 @@ ipcMain.on('create-new-course', async (event, name: string) => {
   const coursename = name.split('=')[1];
 
   const dirname = `./workspaces/${wkspace}/${coursename}`;
+  const settingsdir = `./workspaces/${wkspace}/${wkspace}-settings.json`;
 
   if (!fs.existsSync(dirname)) {
-    fs.mkdir(dirname);
+    fs.mkdir(dirname, (err: Error | null) => {
+      if (err) throw err;
+    });
 
-    if (!fs.existsSync(`${dirname}/pdfs`)) fs.mkdir(`${dirname}/pdfs`);
+    if (!fs.existsSync(`${dirname}/pdfs`))
+      fs.mkdir(`${dirname}/pdfs`, (err: Error | null) => {
+        if (err) throw err;
+      });
 
-    if (!fs.existsSync(`${dirname}/videos`)) fs.mkdir(`${dirname}/videos`);
+    if (!fs.existsSync(`${dirname}/videos`))
+      fs.mkdir(`${dirname}/videos`, (err: Error | null) => {
+        if (err) throw err;
+      });
 
     if (!fs.existsSync(`${dirname}/assignments`))
-      fs.mkdir(`${dirname}/assignments`);
+      fs.mkdir(`${dirname}/assignments`, (err: Error | null) => {
+        if (err) throw err;
+      });
+
+    fs.readFile(
+      `./workspaces/${wkspace}/${wkspace}-settings.json`,
+      async (err: Error | null, data: string) => {
+        if (err) throw err;
+
+        const settings = JSON.parse(data);
+
+        const newSettings = {
+          courses: Object.values(settings.courses),
+        };
+
+        newSettings.courses.push(coursename);
+
+        await writeJsonFile(
+          `./workspaces/${wkspace}/${wkspace}-settings.json`,
+          newSettings
+        );
+      }
+    );
 
     event.reply('created-course', coursename);
   }

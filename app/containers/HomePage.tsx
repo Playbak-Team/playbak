@@ -3,17 +3,30 @@ import { useSelector, useDispatch } from 'react-redux';
 import Home from '../components/Home/Home';
 import Navbar from '../components/Navbar/Navbar';
 import Loader from '../components/Loader/Loader';
-import { getName } from '../features/profile/profileSlice';
+import {
+  getName,
+  setCourses,
+  getCurrentTerm,
+} from '../features/profile/profileSlice';
+
+const { ipcRenderer } = window.require('electron');
 
 export default function HomePage() {
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const name = useSelector(getName);
+  const workspace = useSelector(getCurrentTerm);
 
-  // useEffect(() => {
-  //   dispatch(setWorkspace(LST));
-  //   setLoading(false);
-  // }, [LST, dispatch]);
+  useEffect(() => {
+    ipcRenderer.send('get-courses', workspace);
+  }, [workspace]);
+
+  useEffect(() => {
+    ipcRenderer.on('return-courses', (_event: any, courses: string[]) => {
+      dispatch(setCourses(Object.values(courses)));
+      setLoading(false);
+    });
+  }, []);
 
   return (
     <div>

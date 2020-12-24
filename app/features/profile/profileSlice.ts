@@ -21,16 +21,35 @@ const profileSlice = createSlice({
   reducers: {
     setWorkspace: (state, action: PayloadAction<string>) => {
       state.selectedWorkspace = action.payload;
+      ipcRenderer.send('save-settings', {
+        name: state.name,
+        LST: state.selectedWorkspace,
+        LL: '',
+        AWKS: state.availableWorkspaces,
+      });
     },
     setAvailableWorkspaces: (state, action: PayloadAction<string[]>) => {
       state.availableWorkspaces = action.payload;
     },
-    addCourse: (state, action: PayloadAction<string[]>) => {
-      state.courses.push(action.payload[0]);
-      state.links.push(action.payload[1]);
+    addCourse: (state, action: PayloadAction<string>) => {
+      state.courses.push(action.payload);
+      ipcRenderer.send(
+        'create-new-course',
+        `${state.selectedWorkspace}=${action.payload}`
+      );
+    },
+    setCourses: (state, action: PayloadAction<string[]>) => {
+      state.courses = action.payload;
     },
     addWorkspace: (state, action: PayloadAction<string>) => {
       state.availableWorkspaces.push(action.payload);
+      ipcRenderer.send('create-new-workspace', action.payload);
+      ipcRenderer.send('save-settings', {
+        name: state.name,
+        LST: state.selectedWorkspace,
+        LL: '',
+        AWKS: state.availableWorkspaces,
+      });
     },
     setName: (state, action: PayloadAction<string>) => {
       state.name = action.payload;
@@ -50,6 +69,7 @@ export const {
   setWorkspace,
   setName,
   addWorkspace,
+  setCourses,
 } = profileSlice.actions;
 
 export default profileSlice.reducer;

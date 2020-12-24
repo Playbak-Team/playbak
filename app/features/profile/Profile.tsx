@@ -12,13 +12,20 @@ import IconButton from '@material-ui/core/IconButton';
 import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from '@material-ui/icons/Edit';
 import TextField from '@material-ui/core/TextField';
+import Collapse from '@material-ui/core/Collapse';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import {
   getCurrentTerm,
   setName,
   getName,
   getAllWorkspaces,
+  addWorkspace,
+  setWorkspace,
+  addCourse,
+  getCurrentCourses,
 } from './profileSlice';
+import { WorkspaceEntryProps } from '../../types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -71,6 +78,32 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       justifyContent: 'space-between',
     },
+    workspaceentry: {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alginItems: 'center',
+      paddingTop: '1vh',
+      paddingBottom: '1vh',
+      paddingLeft: '1vw',
+      border: '1px solid black',
+      textAlign: 'center',
+    },
+    workspacearea: {
+      margin: '2em 2em 2em 2em',
+      padding: '2em, 2em, 2em, 2em',
+      border: '1px solid black',
+      minHeight: '80vh',
+    },
+    workspaceareatitle: {
+      margin: '0.5em 0.5em 0.5em 0.5em',
+      padding: '2em, 2em, 2em, 2em',
+      fontSize: '3em',
+      border: '1px solid black',
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
   })
 );
 
@@ -97,11 +130,33 @@ const CssTextField = withStyles({
   },
 })(TextField);
 
+function WorkspaceEntry(props: WorkspaceEntryProps) {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const { name } = props;
+  return (
+    <div className={classes.workspaceentry}>
+      {name}
+      <IconButton
+        style={{ color: 'blue' }}
+        onClick={() => dispatch(setWorkspace(name))}
+      >
+        <ArrowForwardIosIcon />
+      </IconButton>
+    </div>
+  );
+}
+
 export default function Profile() {
   const [editingName, setEditingName] = useState(false);
+  const [addToWorkspace, setAddToWorkspace] = useState(false);
+  const [addCoursePrompt, setAddCoursePrompt] = useState(false);
+  const [courseString, setCourseString] = useState('');
+  const [workspaceString, setWorkspaceString] = useState('');
   const classes = useStyles();
   const name = useSelector(getName);
   const allWorkspaces = useSelector(getAllWorkspaces);
+  const allCourses = useSelector(getCurrentCourses);
   const currentTerm = useSelector(getCurrentTerm);
   const [nameChange, setNameChange] = useState('');
   // const wkspace = useSelector(getCurrentTerm);
@@ -164,7 +219,7 @@ export default function Profile() {
             </div>
             <div className={classes.workspacestitle}>
               Available Workspaces
-              <IconButton>
+              <IconButton onClick={() => setAddToWorkspace(!addToWorkspace)}>
                 <AddCircleIcon
                   style={{
                     marginTop: 0,
@@ -175,12 +230,108 @@ export default function Profile() {
                 />
               </IconButton>
             </div>
-            <div className={classes.workspacesdiv}>wow no way</div>
+            <Collapse in={addToWorkspace}>
+              <div
+                style={{
+                  marginBottom: '10px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="Enter path"
+                  variant="outlined"
+                  style={{
+                    width: '100%',
+                  }}
+                  value={workspaceString}
+                  onChange={(e) => setWorkspaceString(e.target.value)}
+                />
+                <IconButton
+                  style={{
+                    fontSize: 100,
+                    color: 'green',
+                  }}
+                  aria-label="edit"
+                  onClick={() => {
+                    dispatch(addWorkspace(workspaceString));
+                  }}
+                >
+                  <CheckIcon />
+                </IconButton>
+              </div>
+            </Collapse>
+            <div className={classes.workspacesdiv}>
+              {allWorkspaces.map((n) => (
+                <div key={n}>
+                  <WorkspaceEntry key={n} name={n} />
+                </div>
+              ))}
+            </div>
           </div>
         </Grid>
-        {/* <Grid item xs={9}>
-          <Paper className={classes.paper}>potato</Paper>
-        </Grid> */}
+        <Grid item xs={9}>
+          <div className={classes.workspacearea}>
+            <div className={classes.workspaceareatitle}>
+              {currentTerm === '' ? (
+                <div>No workspace selected</div>
+              ) : (
+                <div>{currentTerm}</div>
+              )}
+              <IconButton onClick={() => setAddCoursePrompt(!addCoursePrompt)}>
+                <AddCircleIcon
+                  style={{
+                    marginTop: 0,
+                    marginBottom: 0,
+                    color: 'white',
+                    alignSelf: 'flex-end',
+                  }}
+                />
+              </IconButton>
+            </div>
+            <Collapse in={addCoursePrompt}>
+              <div
+                style={{
+                  marginBottom: '10px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="Enter path"
+                  variant="outlined"
+                  style={{
+                    width: '100%',
+                  }}
+                  value={courseString}
+                  onChange={(e) => setCourseString(e.target.value)}
+                />
+                <IconButton
+                  style={{
+                    fontSize: 100,
+                    color: 'green',
+                  }}
+                  aria-label="edit"
+                  onClick={() => {
+                    dispatch(addCourse(courseString));
+                    setAddCoursePrompt(false);
+                  }}
+                >
+                  <CheckIcon />
+                </IconButton>
+              </div>
+            </Collapse>
+            {allCourses.map((n) => (
+              <div key={n}>
+                <WorkspaceEntry key={n} name={n} />
+              </div>
+            ))}
+          </div>
+        </Grid>
       </Grid>
     </div>
   );

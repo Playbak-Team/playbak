@@ -15,4 +15,14 @@ type HomeProps = {
   name: string;
 };
 
-export { CollapsibleProps, CollapsibleCardProps, VideoPlayerProps, HomeProps };
+type WorkspaceEntryProps = {
+  name: string;
+};
+
+export {
+  CollapsibleProps,
+  CollapsibleCardProps,
+  VideoPlayerProps,
+  HomeProps,
+  WorkspaceEntryProps,
+};
