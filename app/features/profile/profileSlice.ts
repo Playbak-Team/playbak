@@ -5,13 +5,13 @@ import { ipcRenderer } from 'electron';
 import { RootState } from '../../store';
 import { ProfileStateInterface } from '../../interfaces';
 
-import udata from '../../../db/stores/settings.json';
+import udata from '../../../resources/db/stores/settings.json';
 
 const initialState: ProfileStateInterface = {
   name: udata.name,
   selectedWorkspace: udata.LST,
   availableWorkspaces: Object.values(udata.AWKS),
-  courses: [],
+  courses: udata.courses,
   links: [],
 };
 
@@ -21,12 +21,7 @@ const profileSlice = createSlice({
   reducers: {
     setWorkspace: (state, action: PayloadAction<string>) => {
       state.selectedWorkspace = action.payload;
-      ipcRenderer.send('save-settings', {
-        name: state.name,
-        LST: state.selectedWorkspace,
-        LL: '',
-        AWKS: state.availableWorkspaces,
-      });
+      ipcRenderer.send('get-courses', action.payload);
     },
     setAvailableWorkspaces: (state, action: PayloadAction<string[]>) => {
       state.availableWorkspaces = action.payload;
@@ -40,6 +35,13 @@ const profileSlice = createSlice({
     },
     setCourses: (state, action: PayloadAction<string[]>) => {
       state.courses = action.payload;
+      ipcRenderer.send('save-settings', {
+        name: state.name,
+        LST: state.selectedWorkspace,
+        LL: '',
+        AWKS: state.availableWorkspaces,
+        courses: state.courses,
+      });
     },
     addWorkspace: (state, action: PayloadAction<string>) => {
       state.availableWorkspaces.push(action.payload);
@@ -49,6 +51,7 @@ const profileSlice = createSlice({
         LST: state.selectedWorkspace,
         LL: '',
         AWKS: state.availableWorkspaces,
+        courses: Object.values(state.courses),
       });
     },
     setName: (state, action: PayloadAction<string>) => {
@@ -58,6 +61,15 @@ const profileSlice = createSlice({
         LST: state.selectedWorkspace,
         LL: '',
         AWKS: state.availableWorkspaces,
+      });
+    },
+    saveSettings: (state, _action: PayloadAction<string>) => {
+      ipcRenderer.send('save-settings', {
+        name: state.name,
+        LST: state.selectedWorkspace,
+        LL: '',
+        AWKS: state.availableWorkspaces,
+        courses: state.courses,
       });
     },
   },
@@ -70,6 +82,7 @@ export const {
   setName,
   addWorkspace,
   setCourses,
+  saveSettings,
 } = profileSlice.actions;
 
 export default profileSlice.reducer;

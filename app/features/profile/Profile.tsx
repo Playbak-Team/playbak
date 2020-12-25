@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   makeStyles,
   createStyles,
@@ -24,8 +24,11 @@ import {
   setWorkspace,
   addCourse,
   getCurrentCourses,
+  setCourses,
 } from './profileSlice';
 import { WorkspaceEntryProps } from '../../types';
+
+const { ipcRenderer } = window.require('electron');
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexGrow: 1,
       overflowX: 'hidden',
       overflowY: 'hidden',
+      backgroundColor: '#0B1E38',
     },
     paper: {
       padding: theme.spacing(2),
@@ -52,24 +56,26 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      borderBottom: '3px solid black',
+      borderBottom: '3px solid #7FC5DC',
     },
     termrow: {
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'flex-start',
       marginTop: '3vh',
-      borderBottom: '3px solid black',
+      borderBottom: '3px solid #7FC5DC',
       paddingBottom: '3vh',
     },
     workspacesdiv: {
       marginTop: '1vh',
       width: '100%',
+      height: '100%',
       color: 'white',
       minHeight: '50vh',
       maxHeight: '50vh',
-      overflowY: 'scroll',
       textAlign: 'left',
+      paddingRight: '17px',
+      boxSizing: 'content-box',
     },
     workspacestitle: {
       display: 'flex',
@@ -86,23 +92,25 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingTop: '1vh',
       paddingBottom: '1vh',
       paddingLeft: '1vw',
-      border: '1px solid black',
+      border: '1px solid #173679',
       textAlign: 'center',
     },
     workspacearea: {
       margin: '2em 2em 2em 2em',
       padding: '2em, 2em, 2em, 2em',
-      border: '1px solid black',
+      border: '1px solid #173679',
       minHeight: '80vh',
     },
     workspaceareatitle: {
       margin: '0.5em 0.5em 0.5em 0.5em',
       padding: '2em, 2em, 2em, 2em',
       fontSize: '3em',
-      border: '1px solid black',
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'space-between',
+    },
+    whitetext: {
+      color: 'white',
     },
   })
 );
@@ -113,7 +121,7 @@ const CssTextField = withStyles({
       color: 'white',
     },
     '& .MuiInput-underline:after': {
-      borderBottomColor: 'yellow',
+      borderBottomColor: 'white',
     },
     '& .MuiOutlinedInput-root': {
       '& fieldset': {
@@ -123,7 +131,7 @@ const CssTextField = withStyles({
         borderColor: 'white',
       },
       '&.Mui-focused fieldset': {
-        borderColor: 'yellow',
+        borderColor: 'white',
       },
     },
     color: 'white',
@@ -139,7 +147,9 @@ function WorkspaceEntry(props: WorkspaceEntryProps) {
       {name}
       <IconButton
         style={{ color: 'blue' }}
-        onClick={() => dispatch(setWorkspace(name))}
+        onClick={() => {
+          dispatch(setWorkspace(name));
+        }}
       >
         <ArrowForwardIosIcon />
       </IconButton>
@@ -162,6 +172,12 @@ export default function Profile() {
   // const wkspace = useSelector(getCurrentTerm);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    ipcRenderer.on('return-courses', (_event: any, courses: string[]) => {
+      dispatch(setCourses(Object.values(courses)));
+    });
+  }, []);
+
   return (
     <div className={classes.root}>
       <Grid container spacing={3}>
@@ -176,6 +192,9 @@ export default function Profile() {
                     label="Enter new name"
                     defaultValue={name}
                     variant="outlined"
+                    InputProps={{
+                      className: classes.whitetext,
+                    }}
                     onChange={(e) => setNameChange(e.target.value)}
                     value={nameChange}
                   />
@@ -239,12 +258,15 @@ export default function Profile() {
                   justifyContent: 'space-between',
                 }}
               >
-                <TextField
+                <CssTextField
                   id="outlined-basic"
                   label="Enter path"
                   variant="outlined"
                   style={{
                     width: '100%',
+                  }}
+                  InputProps={{
+                    className: classes.whitetext,
                   }}
                   value={workspaceString}
                   onChange={(e) => setWorkspaceString(e.target.value)}
@@ -300,12 +322,15 @@ export default function Profile() {
                   justifyContent: 'space-between',
                 }}
               >
-                <TextField
+                <CssTextField
                   id="outlined-basic"
                   label="Enter path"
                   variant="outlined"
                   style={{
                     width: '100%',
+                  }}
+                  InputProps={{
+                    className: classes.whitetext,
                   }}
                   value={courseString}
                   onChange={(e) => setCourseString(e.target.value)}
