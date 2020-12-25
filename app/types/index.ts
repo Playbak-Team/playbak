@@ -19,10 +19,15 @@ type WorkspaceEntryProps = {
   name: string;
 };
 
+type CourseEntryProps = {
+  name: string;
+};
+
 export {
   CollapsibleProps,
   CollapsibleCardProps,
   VideoPlayerProps,
   HomeProps,
   WorkspaceEntryProps,
+  CourseEntryProps,
 };

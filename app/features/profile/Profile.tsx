@@ -15,6 +15,7 @@ import TextField from '@material-ui/core/TextField';
 import Collapse from '@material-ui/core/Collapse';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import CancelRoundedIcon from '@material-ui/icons/CancelRounded';
 import {
   getCurrentTerm,
   setName,
@@ -26,7 +27,7 @@ import {
   getCurrentCourses,
   setCourses,
 } from './profileSlice';
-import { WorkspaceEntryProps } from '../../types';
+import { WorkspaceEntryProps, CourseEntryProps } from '../../types';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -37,6 +38,7 @@ const useStyles = makeStyles((theme: Theme) =>
       overflowX: 'hidden',
       overflowY: 'hidden',
       backgroundColor: '#0B1E38',
+      height: '100vh',
     },
     paper: {
       padding: theme.spacing(2),
@@ -66,16 +68,22 @@ const useStyles = makeStyles((theme: Theme) =>
       borderBottom: '3px solid #7FC5DC',
       paddingBottom: '3vh',
     },
-    workspacesdiv: {
-      marginTop: '1vh',
-      width: '100%',
-      height: '100%',
-      color: 'white',
+    workspacesdivparent: {
       minHeight: '50vh',
       maxHeight: '50vh',
-      textAlign: 'left',
-      paddingRight: '17px',
-      boxSizing: 'content-box',
+      width: '100%',
+      overflow: 'hidden',
+      height: '100%',
+      position: 'relative',
+      border: '2px solid #4888C8',
+    },
+    workspacesdiv: {
+      position: 'absolute',
+      top: '0px',
+      bottom: '0px',
+      left: '0px',
+      right: '-17px',
+      overflowY: 'scroll',
     },
     workspacestitle: {
       display: 'flex',
@@ -98,7 +106,6 @@ const useStyles = makeStyles((theme: Theme) =>
     workspacearea: {
       margin: '2em 2em 2em 2em',
       padding: '2em, 2em, 2em, 2em',
-      border: '1px solid #173679',
       minHeight: '80vh',
     },
     workspaceareatitle: {
@@ -112,6 +119,13 @@ const useStyles = makeStyles((theme: Theme) =>
     whitetext: {
       color: 'white',
     },
+    buttonstyle: {
+      marginBottom: '10px',
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      color: 'white',
+    },
   })
 );
 
@@ -122,6 +136,12 @@ const CssTextField = withStyles({
     },
     '& .MuiInput-underline:after': {
       borderBottomColor: 'white',
+    },
+    '& .MuiInputBase-input': {
+      color: 'white',
+    },
+    '& .MuiFormLabel-root': {
+      color: 'white',
     },
     '& .MuiOutlinedInput-root': {
       '& fieldset': {
@@ -155,6 +175,13 @@ function WorkspaceEntry(props: WorkspaceEntryProps) {
       </IconButton>
     </div>
   );
+}
+
+function CourseEntry(props: CourseEntryProps) {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const { name } = props;
+  return <div className={classes.workspaceentry}>{name}</div>;
 }
 
 export default function Profile() {
@@ -239,14 +266,11 @@ export default function Profile() {
             <div className={classes.workspacestitle}>
               Available Workspaces
               <IconButton onClick={() => setAddToWorkspace(!addToWorkspace)}>
-                <AddCircleIcon
-                  style={{
-                    marginTop: 0,
-                    marginBottom: 0,
-                    color: 'white',
-                    alignSelf: 'flex-end',
-                  }}
-                />
+                {addToWorkspace ? (
+                  <CancelRoundedIcon className={classes.buttonstyle} />
+                ) : (
+                  <AddCircleIcon className={classes.buttonstyle} />
+                )}
               </IconButton>
             </div>
             <Collapse in={addToWorkspace}>
@@ -260,7 +284,7 @@ export default function Profile() {
               >
                 <CssTextField
                   id="outlined-basic"
-                  label="Enter path"
+                  label="Enter workspace name"
                   variant="outlined"
                   style={{
                     width: '100%',
@@ -285,12 +309,14 @@ export default function Profile() {
                 </IconButton>
               </div>
             </Collapse>
-            <div className={classes.workspacesdiv}>
-              {allWorkspaces.map((n) => (
-                <div key={n}>
-                  <WorkspaceEntry key={n} name={n} />
-                </div>
-              ))}
+            <div className={classes.workspacesdivparent}>
+              <div className={classes.workspacesdiv}>
+                {allWorkspaces.map((n) => (
+                  <div key={n}>
+                    <WorkspaceEntry key={n} name={n} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </Grid>
@@ -303,14 +329,11 @@ export default function Profile() {
                 <div>{currentTerm}</div>
               )}
               <IconButton onClick={() => setAddCoursePrompt(!addCoursePrompt)}>
-                <AddCircleIcon
-                  style={{
-                    marginTop: 0,
-                    marginBottom: 0,
-                    color: 'white',
-                    alignSelf: 'flex-end',
-                  }}
-                />
+                {addCoursePrompt ? (
+                  <CancelRoundedIcon className={classes.buttonstyle} />
+                ) : (
+                  <AddCircleIcon className={classes.buttonstyle} />
+                )}
               </IconButton>
             </div>
             <Collapse in={addCoursePrompt}>
@@ -350,11 +373,15 @@ export default function Profile() {
                 </IconButton>
               </div>
             </Collapse>
-            {allCourses.map((n) => (
-              <div key={n}>
-                <WorkspaceEntry key={n} name={n} />
+            <div className={classes.workspacesdivparent}>
+              <div className={classes.workspacesdiv}>
+                {allCourses.map((n) => (
+                  <div key={n}>
+                    <CourseEntry key={n} name={n} />
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </Grid>
       </Grid>

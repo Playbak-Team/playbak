@@ -31,20 +31,7 @@ interface Settings {
 }
 
 ipcMain.on('save-settings', async (_event, settings: Settings) => {
-  await writeJsonFile('../resources/db/stores/settings.json', settings);
-});
-
-ipcMain.on('get-courses-profile', async (event, wkspace: string) => {
-  fs.readFile(
-    `./workspaces/${wkspace}/${wkspace}-settings.json`,
-    async (err: Error | null, data: string) => {
-      if (err) throw err;
-
-      const settings = JSON.parse(data);
-
-      event.reply('return-courses-profile', settings.courses);
-    }
-  );
+  await writeJsonFile('./resources/db/stores/settings.json', settings);
 });
 
 ipcMain.on('get-courses', async (event, wkspace: string) => {
