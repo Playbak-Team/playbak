@@ -31,7 +31,7 @@ interface Settings {
 }
 
 ipcMain.on('save-settings', async (_event, settings: Settings) => {
-  await writeJsonFile('./db/stores/settings.json', settings);
+  await writeJsonFile('./resources/db/stores/settings.json', settings);
 });
 
 ipcMain.on('get-courses', async (event, wkspace: string) => {
@@ -58,13 +58,6 @@ ipcMain.on('create-new-workspace', async (event, name: string) => {
     await fs.mkdir(`./workspaces/${name}`, (err: Error | null, _data: any) => {
       if (err) throw err;
     });
-    // await fs.open(
-    //   `./workspaces/${name}/${name}-settings.json`,
-    //   'w',
-    //   (err: Error | null, _data: any) => {
-    //     if (err) throw err;
-    //   }
-    // );
     await writeJsonFile(`./workspaces/${name}/${name}-settings.json`, {
       courses: [],
     });
@@ -190,6 +183,8 @@ const createWindow = async () => {
           }
         : {
             preload: path.join(__dirname, 'dist/renderer.prod.js'),
+            nodeIntegration: true,
+            enableRemoteModule: true,
           },
   });
 

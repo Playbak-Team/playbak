@@ -7,6 +7,7 @@ import {
   getName,
   setCourses,
   getCurrentTerm,
+  saveSettings,
 } from '../features/profile/profileSlice';
 
 const { ipcRenderer } = window.require('electron');
@@ -18,7 +19,11 @@ export default function HomePage() {
   const workspace = useSelector(getCurrentTerm);
 
   useEffect(() => {
-    ipcRenderer.send('get-courses', workspace);
+    if (workspace !== '') {
+      ipcRenderer.send('get-courses', workspace);
+    } else {
+      setLoading(false);
+    }
   }, [workspace]);
 
   useEffect(() => {
