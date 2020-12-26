@@ -121,7 +121,9 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleAccountClick}>My account</MenuItem>
+      <MenuItem id="my-account" onClick={handleAccountClick}>
+        My account
+      </MenuItem>
     </Menu>
   );
 

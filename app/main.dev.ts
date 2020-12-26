@@ -70,7 +70,6 @@ ipcMain.on('create-new-course', async (event, name: string) => {
   const coursename = name.split('=')[1];
 
   const dirname = `./workspaces/${wkspace}/${coursename}`;
-  const settingsdir = `./workspaces/${wkspace}/${wkspace}-settings.json`;
 
   if (!fs.existsSync(dirname)) {
     fs.mkdir(dirname, (err: Error | null) => {

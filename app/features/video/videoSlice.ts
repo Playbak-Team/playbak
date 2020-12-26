@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-cycle
-import { AppThunk, RootState } from '../../store';
+import { RootState } from '../../store';
 import { VideoStateInterface } from '../../interfaces';
 
 const initialState: VideoStateInterface = {
