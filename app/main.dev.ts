@@ -116,6 +116,22 @@ ipcMain.on('create-new-course', async (event, name: string) => {
   }
 });
 
+ipcMain.on('get-video-files', (event, dirPath: string) => {
+  if (fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
+    event.returnValue = fs
+      .readdirSync(dirPath, {
+        withFileTypes: true,
+      })
+      .filter(
+        (dirent: typeof fs.Dirent) =>
+          dirent.isFile() && path.extname(dirent.name) === '.mp4'
+      )
+      .map((dirent: typeof fs.Dirent) => dirent.name);
+  } else {
+    event.returnValue = [];
+  }
+});
+
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';

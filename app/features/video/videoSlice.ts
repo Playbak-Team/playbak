@@ -4,10 +4,7 @@ import { AppThunk, RootState } from '../../store';
 import { VideoStateInterface } from '../../interfaces';
 
 const initialState: VideoStateInterface = {
-  videoURLS: [
-    'C:\\Users\\kevin\\Desktop\\cs341lectures',
-    'C:\\Users\\kevin\\Desktop\\cs349lectures',
-  ],
+  videoURLS: [],
   currentVideo: '',
   snackbarActive: false,
   snackbarMessage: '',

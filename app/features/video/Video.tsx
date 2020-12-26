@@ -29,6 +29,7 @@ import {
   disableSnackbar,
   getSnackBarSeverity,
 } from './videoSlice';
+import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
 import routes from '../../constants/routes.json';
 
 import styles from './Video.css';
@@ -39,10 +40,7 @@ import {
   VideoPlayerProps,
 } from '../../types';
 
-// const fileRead = fs.readFileSync('C:\\Users\\kevin\\Videos\\L01P2.mp4');
-
-// eslint-disable-next-line no-console
-// console.log(fileRead.toString());
+const { ipcRenderer } = require('electron');
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -143,16 +141,13 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
   const { dir } = props;
+
+  const wkspace = useSelector(getCurrentTerm);
   const [files, setFiles] = useState<string[]>([]);
 
+  const videoDir = `..\\workspaces\\${wkspace}\\${dir}\\videos`;
   useEffect(() => {
-    fs.readdir(dir, (_err, found) => {
-      found.forEach((f) => {
-        if (f.endsWith('.mp4')) {
-          setFiles((old) => [...old, f]);
-        }
-      });
-    });
+    setFiles(ipcRenderer.sendSync('get-video-files', videoDir));
   }, []);
 
   return (
@@ -179,7 +174,11 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
             Development.
           </p> */}
           {files.map((file) => (
-            <CollapsibleCard dir={dir} filepath={file} key={file} />
+            <CollapsibleCard
+              dir={videoDir}
+              filepath={file}
+              key={Math.random()}
+            />
           ))}
         </div>
       </div>
@@ -189,15 +188,14 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
 
 export default function Video() {
   const dispatch = useDispatch();
-  const paths = useSelector(getPathURLS);
   const curVideo = useSelector(getCurrentVideo);
   const snackbar = useSelector(isSnackBarActive);
   const snackbarMessage = useSelector(getSnackBarMessage);
   const severity = useSelector(getSnackBarSeverity);
   const classes = useStyles();
   const [menuExpanded, setMenuExpanded] = useState<boolean>(true);
-  const [showAdd, setShowAdd] = useState<boolean>(false);
-  const [pathToAdd, setPathToAdd] = useState<string>('');
+
+  const currentCourses = useSelector(getCurrentCourses);
 
   return (
     <div className={classes.root}>
@@ -221,7 +219,7 @@ export default function Video() {
             {menuExpanded ? (
               <div>
                 <div className={classes.selectiontop}>
-                  <IconButton
+                  {/* <IconButton
                     color="primary"
                     aria-label="Select"
                     onClick={() => setShowAdd(!showAdd)}
@@ -231,7 +229,7 @@ export default function Video() {
                     ) : (
                       <AddCircleOutlineIcon />
                     )}
-                  </IconButton>
+                  </IconButton> */}
                   <IconButton
                     color="primary"
                     aria-label="Select"
@@ -240,7 +238,7 @@ export default function Video() {
                     <ChevronLeftIcon />
                   </IconButton>
                 </div>
-                <Collapse in={showAdd}>
+                {/* <Collapse in={showAdd}>
                   <div
                     style={{
                       marginBottom: '10px',
@@ -266,9 +264,9 @@ export default function Video() {
                       <CreateNewFolderIcon />
                     </IconButton>
                   </div>
-                </Collapse>
+                </Collapse> */}
 
-                {paths.map((dir: string) => (
+                {currentCourses.map((dir: string) => (
                   <MyCollapsible key={dir} dir={dir} />
                 ))}
               </div>
