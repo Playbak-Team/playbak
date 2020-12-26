@@ -22,7 +22,3 @@ test(
   'should not have any logs in console of main window',
   assertNoConsoleErrors
 );
-
-// test('should navigate to Profile with click on the profile icon', async (t) => {
-//   await t.click('[data-tid=my-account] > li').expect(getCounterText()).eql('0');
-// });
