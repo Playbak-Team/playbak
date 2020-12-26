@@ -122,7 +122,7 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
       <IconButton
         color="primary"
         aria-label="Select"
-        onClick={() => dispatch(setVideo(`${dir}\\${filepath}`))}
+        onClick={() => dispatch(setVideo(`.${dir}\\${filepath}`))}
       >
         <PlayCircleOutlineIcon />
       </IconButton>
@@ -145,7 +145,7 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
   const wkspace = useSelector(getCurrentTerm);
   const [files, setFiles] = useState<string[]>([]);
 
-  const videoDir = `..\\workspaces\\${wkspace}\\${dir}\\videos`;
+  const videoDir = `.\\workspaces\\${wkspace}\\${dir}\\videos`;
   useEffect(() => {
     setFiles(ipcRenderer.sendSync('get-video-files', videoDir));
   }, []);
