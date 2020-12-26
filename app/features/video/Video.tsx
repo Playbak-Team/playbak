@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import fs from 'fs';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -10,20 +9,13 @@ import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
-import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import TextField from '@material-ui/core/TextField';
-import Collapse from '@material-ui/core/Collapse';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import {
   getCurrentVideo,
-  getPathURLS,
   setVideo,
-  addToURLS,
   isSnackBarActive,
   getSnackBarMessage,
   disableSnackbar,
@@ -148,7 +140,7 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
   const videoDir = `.\\workspaces\\${wkspace}\\${dir}\\videos`;
   useEffect(() => {
     setFiles(ipcRenderer.sendSync('get-video-files', videoDir));
-  }, []);
+  }, [videoDir]);
 
   return (
     <div className={styles.wrapcollabsible}>
