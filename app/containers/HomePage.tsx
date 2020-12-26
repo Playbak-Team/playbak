@@ -7,7 +7,6 @@ import {
   getName,
   setCourses,
   getCurrentTerm,
-  saveSettings,
 } from '../features/profile/profileSlice';
 
 const { ipcRenderer } = window.require('electron');

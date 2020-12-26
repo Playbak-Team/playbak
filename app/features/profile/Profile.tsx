@@ -179,7 +179,6 @@ function WorkspaceEntry(props: WorkspaceEntryProps) {
 
 function CourseEntry(props: CourseEntryProps) {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { name } = props;
   return <div className={classes.workspaceentry}>{name}</div>;
 }
