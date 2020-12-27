@@ -14,5 +14,10 @@ interface ProfileStateInterface {
   links: string[];
 }
 
+interface KanbanStateInterface {
+  columns: string[];
+  entries: string[];
+}
+
 // eslint-disable-next-line import/prefer-default-export
-export { VideoStateInterface, ProfileStateInterface };
+export { VideoStateInterface, ProfileStateInterface, KanbanStateInterface };

@@ -23,12 +23,68 @@ import MenuBuilder from './menu';
 
 const fs = require('fs');
 
+const sqlite3 = require('sqlite3');
+
 interface Settings {
   name: string;
   LST: string;
   LL: string;
   AWKS: string[];
 }
+
+interface Columns {
+  name: string;
+}
+
+interface Events {
+  id: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  label: string;
+  duedate: string;
+  belongsto: string;
+}
+
+const getColumns = (db) => {
+  return new Promise<Columns[]>((resolve) => {
+    db.all('SELECT name FROM columns', (err: Error | null, data: any) => {
+      resolve(data);
+    });
+  });
+};
+
+const getEvents = (db) => {
+  return new Promise<Events[]>((resolve) => {
+    db.all('SELECT * FROM entry', (err: Error | null, data: any) => {
+      resolve(data);
+    });
+  });
+};
+
+ipcMain.on('load-kanban', async (event, workspace: string) => {
+  const db = await new sqlite3.Database(
+    `./workspaces/${workspace}/kanban.db`,
+    (err: Error | null) => {
+      if (err) throw err;
+    }
+  );
+
+  await db.serialize(async () => {
+    const cols = await getColumns(db);
+    const events = await getEvents(db);
+
+    const c = cols.map((ob) => ob.name);
+    const e = events.map(
+      (ob) =>
+        `${ob.id},${ob.title},${ob.subtitle},${ob.description},${ob.label},${ob.duedate},${ob.belongsto}`
+    );
+
+    event.reply('kanban-data', [c, e]);
+
+    // const events = await getEvents(db);
+  });
+});
 
 ipcMain.on('save-settings', async (_event, settings: Settings) => {
   await writeJsonFile('./resources/db/stores/settings.json', settings);
@@ -49,18 +105,36 @@ ipcMain.on('get-courses', async (event, wkspace: string) => {
 
 ipcMain.on('create-new-workspace', async (event, name: string) => {
   if (!fs.existsSync(`./workspaces`)) {
-    await fs.mkdir(`./workspaces`, (err: Error | null, _data: any) => {
+    await fs.mkdir(`./workspaces`, (err: Error | null) => {
       if (err) throw err;
     });
   }
 
   if (!fs.existsSync(`./workspaces/${name}`)) {
-    await fs.mkdir(`./workspaces/${name}`, (err: Error | null, _data: any) => {
+    await fs.mkdir(`./workspaces/${name}`, (err: Error | null) => {
       if (err) throw err;
     });
     await writeJsonFile(`./workspaces/${name}/${name}-settings.json`, {
       courses: [],
     });
+
+    // eslint-disable-next-line prefer-const
+    const db = new sqlite3.Database(
+      `./workspaces/${name}/kanban.db`,
+      (err: Error | null) => {
+        if (err) throw err;
+      }
+    );
+
+    db.serialize(() => {
+      db.run('CREATE TABLE columns (name TEXT NOT NULL PRIMARY KEY)');
+      db.run(
+        'CREATE TABLE entry (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, subtitle TEXT, description TEXT, label TEXT, duedate TEXT, belongsto TEXT)'
+      );
+    });
+
+    db.close();
+
     event.reply('created-workspace', name);
   }
 });
