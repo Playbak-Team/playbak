@@ -22,6 +22,7 @@ import writeJsonFile from 'write-json-file';
 import MenuBuilder from './menu';
 
 const fs = require('fs');
+const folders = require('./utils/playbakFolders');
 
 interface Settings {
   name: string;
@@ -31,12 +32,12 @@ interface Settings {
 }
 
 ipcMain.on('save-settings', async (_event, settings: Settings) => {
-  await writeJsonFile('./resources/db/stores/settings.json', settings);
+  await writeJsonFile(folders.settingFile, settings);
 });
 
 ipcMain.on('get-courses', async (event, wkspace: string) => {
   fs.readFile(
-    `./workspaces/${wkspace}/${wkspace}-settings.json`,
+    folders.getWorkspaceSettingFile(wkspace),
     async (err: Error | null, data: string) => {
       if (err) throw err;
 
@@ -48,72 +49,70 @@ ipcMain.on('get-courses', async (event, wkspace: string) => {
 });
 
 ipcMain.on('create-new-workspace', async (event, name: string) => {
-  if (!fs.existsSync(`./workspaces`)) {
-    await fs.mkdir(`./workspaces`, (err: Error | null, _data: any) => {
-      if (err) throw err;
-    });
+  if (!fs.existsSync(folders.workspaceRootDir)) {
+    await fs.mkdir(
+      folders.workspaceRootDir,
+      (err: Error | null, _data: any) => {
+        if (err) throw err;
+      }
+    );
   }
 
-  if (!fs.existsSync(`./workspaces/${name}`)) {
-    await fs.mkdir(`./workspaces/${name}`, (err: Error | null, _data: any) => {
-      if (err) throw err;
-    });
-    await writeJsonFile(`./workspaces/${name}/${name}-settings.json`, {
+  if (!fs.existsSync(folders.getWorkspaceDir(name))) {
+    await fs.mkdir(
+      folders.getWorkspaceDir(name),
+      (err: Error | null, _data: any) => {
+        if (err) throw err;
+      }
+    );
+    await writeJsonFile(folders.getWorkspaceSettingFile(name), {
       courses: [],
     });
     event.reply('created-workspace', name);
   }
 });
 
-ipcMain.on('create-new-course', async (event, name: string) => {
-  const wkspace = name.split('=')[0];
-  const coursename = name.split('=')[1];
-
-  const dirname = `./workspaces/${wkspace}/${coursename}`;
-
-  if (!fs.existsSync(dirname)) {
-    fs.mkdir(dirname, (err: Error | null) => {
-      if (err) throw err;
-    });
-
-    if (!fs.existsSync(`${dirname}/pdfs`))
-      fs.mkdir(`${dirname}/pdfs`, (err: Error | null) => {
-        if (err) throw err;
+ipcMain.on(
+  'create-new-course',
+  async (event, wkspace: string, coursename: string) => {
+    if (!fs.existsSync(folders.getCourseRootDir(wkspace, coursename))) {
+      fs.mkdir(
+        folders.getCourseRootDir(wkspace, coursename),
+        (err: Error | null) => {
+          if (err) throw err;
+        }
+      );
+      folders.courseSubDirs.forEach((subDir) => {
+        if (!fs.existsSync(subDir(wkspace, coursename)))
+          fs.mkdir(subDir(wkspace, coursename), (err: Error | null) => {
+            if (err) throw err;
+          });
       });
 
-    if (!fs.existsSync(`${dirname}/videos`))
-      fs.mkdir(`${dirname}/videos`, (err: Error | null) => {
-        if (err) throw err;
-      });
+      fs.readFile(
+        folders.getWorkspaceSettingFile(wkspace),
+        async (err: Error | null, data: string) => {
+          if (err) throw err;
 
-    if (!fs.existsSync(`${dirname}/assignments`))
-      fs.mkdir(`${dirname}/assignments`, (err: Error | null) => {
-        if (err) throw err;
-      });
+          const settings = JSON.parse(data);
 
-    fs.readFile(
-      `./workspaces/${wkspace}/${wkspace}-settings.json`,
-      async (err: Error | null, data: string) => {
-        if (err) throw err;
+          const newSettings = {
+            courses: Object.values(settings.courses),
+          };
 
-        const settings = JSON.parse(data);
+          newSettings.courses.push(coursename);
 
-        const newSettings = {
-          courses: Object.values(settings.courses),
-        };
+          await writeJsonFile(
+            folders.getWorkspaceSettingFile(wkspace),
+            newSettings
+          );
+        }
+      );
 
-        newSettings.courses.push(coursename);
-
-        await writeJsonFile(
-          `./workspaces/${wkspace}/${wkspace}-settings.json`,
-          newSettings
-        );
-      }
-    );
-
-    event.reply('created-course', coursename);
+      event.reply('created-course', coursename);
+    }
   }
-});
+);
 
 ipcMain.on('get-video-files', (event, dirPath: string) => {
   if (fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {

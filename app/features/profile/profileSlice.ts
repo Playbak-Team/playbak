@@ -30,7 +30,8 @@ const profileSlice = createSlice({
       state.courses.push(action.payload);
       ipcRenderer.send(
         'create-new-course',
-        `${state.selectedWorkspace}=${action.payload}`
+        state.selectedWorkspace,
+        action.payload
       );
     },
     setCourses: (state, action: PayloadAction<string[]>) => {
