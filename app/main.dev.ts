@@ -20,7 +20,7 @@ import installExtension, {
 } from 'electron-devtools-installer';
 import writeJsonFile from 'write-json-file';
 import MenuBuilder from './menu';
-import { Settings, emptySettings, ProfileStateInterface } from './interfaces';
+import { emptySettings, ProfileStateInterface } from './interfaces';
 
 const fs = require('fs');
 const folders = require('./utils/playbakFolders');
