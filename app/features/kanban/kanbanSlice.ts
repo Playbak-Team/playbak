@@ -25,12 +25,12 @@ const kanbanSlice = createSlice({
     },
     removeColumn: (state, action: PayloadAction<string>) => {
       if (state.columns.includes(action.payload)) {
-        state.columns = state.columns.splice(
-          state.columns.indexOf(action.payload),
-          1
-        );
+        state.columns.splice(state.columns.indexOf(action.payload), 1);
         // db call here
       }
+      state.entries = state.entries.filter(
+        (e) => e.split(',')[6] !== action.payload
+      );
     },
     addEntry: (state, action: PayloadAction<string>) => {
       state.entries.push(action.payload);

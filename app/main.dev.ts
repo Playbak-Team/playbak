@@ -48,7 +48,7 @@ interface Events {
 
 const getColumns = (db) => {
   return new Promise<Columns[]>((resolve) => {
-    db.all('SELECT name FROM columns', (err: Error | null, data: any) => {
+    db.all('SELECT name FROM columns', (_err: Error | null, data: any) => {
       resolve(data);
     });
   });
@@ -56,7 +56,7 @@ const getColumns = (db) => {
 
 const getEvents = (db) => {
   return new Promise<Events[]>((resolve) => {
-    db.all('SELECT * FROM entry', (err: Error | null, data: any) => {
+    db.all('SELECT * FROM entry', (_err: Error | null, data: any) => {
       resolve(data);
     });
   });
