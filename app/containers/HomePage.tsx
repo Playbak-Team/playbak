@@ -6,8 +6,10 @@ import Loader from '../components/Loader/Loader';
 import {
   getName,
   setCourses,
-  getCurrentTerm,
+  setProfile,
 } from '../features/profile/profileSlice';
+
+import { Settings } from '../interfaces';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -15,21 +17,33 @@ export default function HomePage() {
   const [isLoading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const name = useSelector(getName);
-  const workspace = useSelector(getCurrentTerm);
+  // const workspace = useSelector(getCurrentTerm);
 
-  useEffect(() => {
-    if (workspace !== '') {
-      ipcRenderer.send('get-courses', workspace);
+  ipcRenderer.on('return-courses', (_, courses: string[]) => {
+    dispatch(setCourses(Object.values(courses)));
+    setLoading(false);
+  });
+
+  ipcRenderer.on('return-settings', (_event, settings: Settings) => {
+    dispatch(
+      setProfile({
+        name: settings.name,
+        selectedWorkspace: settings.LST,
+        availableWorkspaces: Object.values(settings.AWKS),
+        courses: settings.courses,
+        links: [],
+      })
+    );
+
+    if (settings.LST !== '') {
+      ipcRenderer.send('get-courses', settings.LST);
     } else {
       setLoading(false);
     }
-  }, [workspace]);
+  });
 
   useEffect(() => {
-    ipcRenderer.on('return-courses', (_event: any, courses: string[]) => {
-      dispatch(setCourses(Object.values(courses)));
-      setLoading(false);
-    });
+    ipcRenderer.send('init');
   }, []);
 
   return (

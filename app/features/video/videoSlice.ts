@@ -1,11 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-cycle
 import { RootState } from '../../store';
-import { VideoStateInterface } from '../../interfaces';
+import {
+  VideoData,
+  VideoStateInterface,
+  emptyVideoData,
+} from '../../interfaces';
 
 const initialState: VideoStateInterface = {
   videoURLS: [],
-  currentVideo: '',
+  currentVideo: emptyVideoData(),
   snackbarActive: false,
   snackbarMessage: '',
   snackbarSeverity: undefined,
@@ -32,7 +36,7 @@ const videoSlice = createSlice({
       }
       state.snackbarActive = true;
     },
-    setVideo: (state, action: PayloadAction<string>) => {
+    setVideo: (state, action: PayloadAction<VideoData>) => {
       state.currentVideo = action.payload;
       state.snackbarActive = true;
       state.snackbarMessage = `Video set to ${action.payload}`;

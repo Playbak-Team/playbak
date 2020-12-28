@@ -31,6 +31,7 @@ import {
   CollapsibleCardProps,
   VideoPlayerProps,
 } from '../../types';
+import { VideoData } from '../../interfaces';
 
 const { ipcRenderer } = require('electron');
 
@@ -106,15 +107,15 @@ function Alert(props: AlertProps) {
 function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { dir, filepath } = props;
+  const { video } = props;
 
   return (
     <div className={classes.videobutton}>
-      {filepath}
+      {video.name}
       <IconButton
         color="primary"
         aria-label="Select"
-        onClick={() => dispatch(setVideo(`.${dir}\\${filepath}`))}
+        onClick={() => dispatch(setVideo(video))}
       >
         <PlayCircleOutlineIcon />
       </IconButton>
@@ -132,45 +133,37 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 }
 
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
-  const { dir } = props;
+  const { course } = props;
 
   const wkspace = useSelector(getCurrentTerm);
-  const [files, setFiles] = useState<string[]>([]);
+  const [files, setFiles] = useState<VideoData[]>([]);
 
-  const videoDir = `.\\workspaces\\${wkspace}\\${dir}\\videos`;
+  ipcRenderer.on('return-videos', (_event, videos) => {
+    setFiles(videos);
+  });
+
   useEffect(() => {
-    setFiles(ipcRenderer.sendSync('get-video-files', videoDir));
-  }, [videoDir]);
+    ipcRenderer.send('get-videos', wkspace, course);
+  }, [course, wkspace]);
 
   return (
     <div className={styles.wrapcollabsible}>
       <input
         key={Math.random()}
-        id={`${dir.toString()}-collapsible`}
+        id={`${course.toString()}-collapsible`}
         className={styles.toggle}
         type="checkbox"
       />
       <label
-        htmlFor={`${dir.toString()}-collapsible`}
+        htmlFor={`${course.toString()}-collapsible`}
         className={styles.lbltoggle}
       >
-        {dir}
+        {course}
       </label>
       <div className={styles.collapsiblecontent}>
         <div className={styles.contentinner}>
-          {/* <p>
-            QUnit is by calling one of the object that are embedded in
-            JavaScript, and faster JavaScript program could also used with its
-            elegant, well documented, and functional programming using JS, HTML
-            pages Modernizr is a popular browsers without plug-ins. Test-Driven
-            Development.
-          </p> */}
           {files.map((file) => (
-            <CollapsibleCard
-              dir={videoDir}
-              filepath={file}
-              key={Math.random()}
-            />
+            <CollapsibleCard video={file} key={Math.random()} />
           ))}
         </div>
       </div>
@@ -259,7 +252,7 @@ export default function Video() {
                 </Collapse> */}
 
                 {currentCourses.map((dir: string) => (
-                  <MyCollapsible key={dir} dir={dir} />
+                  <MyCollapsible key={dir} course={dir} />
                 ))}
               </div>
             ) : (
@@ -275,8 +268,8 @@ export default function Video() {
         </Grid>
         <Grid item xs={menuExpanded ? 9 : 11}>
           <Paper className={classes.videocontainer}>
-            {curVideo}
-            <VideoPlayer filepath={curVideo} />
+            {curVideo.name}
+            <VideoPlayer filepath={curVideo.videoPath} />
           </Paper>
         </Grid>
       </Grid>
