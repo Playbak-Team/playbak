@@ -138,7 +138,7 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
   const wkspace = useSelector(getCurrentTerm);
   const [files, setFiles] = useState<VideoData[]>([]);
 
-  ipcRenderer.on('return-videos', (event, videos) => {
+  ipcRenderer.on('return-videos', (_event, videos) => {
     setFiles(videos);
   });
 

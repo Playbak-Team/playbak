@@ -20,19 +20,35 @@ import installExtension, {
 } from 'electron-devtools-installer';
 import writeJsonFile from 'write-json-file';
 import MenuBuilder from './menu';
+import { Settings, emptySettings, ProfileStateInterface } from './interfaces';
 
 const fs = require('fs');
 const folders = require('./utils/playbakFolders');
 
-interface Settings {
-  name: string;
-  LST: string;
-  LL: string;
-  AWKS: string[];
-}
+ipcMain.on('init', async (event) => {
+  if (!fs.existsSync(folders.settingFile)) {
+    fs.writeFileSync(folders.settingFile, JSON.stringify(emptySettings()));
+  }
+  fs.readFile(folders.settingFile, async (err: Error | null, data: string) => {
+    if (err) throw err;
 
-ipcMain.on('save-settings', async (_event, settings: Settings) => {
-  await writeJsonFile(folders.settingFile, settings);
+    const settings = JSON.parse(data);
+
+    event.reply('return-settings', settings);
+  });
+});
+
+ipcMain.on('save-settings', async (_event, settings: ProfileStateInterface) => {
+  fs.writeFileSync(
+    folders.settingFile,
+    JSON.stringify({
+      name: settings.name,
+      LST: settings.selectedWorkspace,
+      LL: '',
+      AWKS: Object.values(settings.availableWorkspaces),
+      courses: Object.values(settings.courses),
+    })
+  );
 });
 
 ipcMain.on('get-courses', async (event, wkspace: string) => {
@@ -114,7 +130,7 @@ ipcMain.on(
   }
 );
 
-ipcMain.on('get-videos', (event, wkspace: string, course: string) => {
+ipcMain.on('get-videos', async (event, wkspace: string, course: string) => {
   const videoDir = folders.getCourseVideoDir(wkspace, course);
   if (fs.existsSync(videoDir) && fs.lstatSync(videoDir).isDirectory()) {
     event.reply(

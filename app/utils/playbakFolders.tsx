@@ -3,7 +3,8 @@ const path = require('path');
 const { app } = require('electron');
 
 const userdataDir = app.getPath('userData');
-const workspaceRootDir = './workspaces';
+const documentsDir = app.getPath('documents');
+const workspaceRootDir = path.resolve(`${documentsDir}/Playbak`);
 
 exports.settingFile = path.resolve(`${userdataDir}/settings.json`);
 

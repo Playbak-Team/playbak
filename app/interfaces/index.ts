@@ -12,6 +12,22 @@ const emptyVideoData = (): VideoData => ({
   watched: false,
 });
 
+interface Settings {
+  name: string;
+  LST: string;
+  LL: string;
+  courses: string[];
+  AWKS: string[];
+}
+
+const emptySettings = (): Settings => ({
+  name: '',
+  LST: '',
+  LL: '',
+  courses: [],
+  AWKS: [],
+});
+
 interface VideoStateInterface {
   videoURLS: string[];
   currentVideo: VideoData;
@@ -34,4 +50,6 @@ export {
   ProfileStateInterface,
   VideoData,
   emptyVideoData,
+  Settings,
+  emptySettings,
 };
