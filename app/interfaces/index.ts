@@ -1,6 +1,20 @@
+interface VideoData {
+  name: string;
+  videoPath: string;
+  pbsPath: string;
+  watched: boolean;
+}
+
+const emptyVideoData = (): VideoData => ({
+  name: '',
+  videoPath: '',
+  pbsPath: '',
+  watched: false,
+});
+
 interface VideoStateInterface {
   videoURLS: string[];
-  currentVideo: string;
+  currentVideo: VideoData;
   snackbarActive: boolean;
   snackbarMessage: string;
   snackbarSeverity: 'success' | 'info' | 'warning' | 'error' | undefined;
@@ -15,4 +29,9 @@ interface ProfileStateInterface {
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export { VideoStateInterface, ProfileStateInterface };
+export {
+  VideoStateInterface,
+  ProfileStateInterface,
+  VideoData,
+  emptyVideoData,
+};

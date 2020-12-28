@@ -114,19 +114,30 @@ ipcMain.on(
   }
 );
 
-ipcMain.on('get-video-files', (event, dirPath: string) => {
-  if (fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
-    event.returnValue = fs
-      .readdirSync(dirPath, {
-        withFileTypes: true,
-      })
-      .filter(
-        (dirent: typeof fs.Dirent) =>
-          dirent.isFile() && path.extname(dirent.name) === '.mp4'
-      )
-      .map((dirent: typeof fs.Dirent) => dirent.name);
+ipcMain.on('get-videos', (event, wkspace: string, course: string) => {
+  const videoDir = folders.getCourseVideoDir(wkspace, course);
+  if (fs.existsSync(videoDir) && fs.lstatSync(videoDir).isDirectory()) {
+    event.reply(
+      'return-videos',
+      fs
+        .readdirSync(videoDir, {
+          withFileTypes: true,
+        })
+        .filter(
+          (dirent: typeof fs.Dirent) =>
+            dirent.isFile() && path.extname(dirent.name) === '.mp4'
+        )
+        .map((dirent: typeof fs.Dirent) => {
+          return {
+            name: dirent.name,
+            videoPath: `${videoDir}/${dirent.name}`,
+            pbsPath: '',
+            watched: false,
+          };
+        })
+    );
   } else {
-    event.returnValue = [];
+    event.reply('return-videos', []);
   }
 });
 
