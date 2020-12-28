@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import fs from 'fs';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -10,25 +9,19 @@ import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
-import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import TextField from '@material-ui/core/TextField';
-import Collapse from '@material-ui/core/Collapse';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import {
   getCurrentVideo,
-  getPathURLS,
   setVideo,
-  addToURLS,
   isSnackBarActive,
   getSnackBarMessage,
   disableSnackbar,
   getSnackBarSeverity,
 } from './videoSlice';
+import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
 import routes from '../../constants/routes.json';
 
 import styles from './Video.css';
@@ -38,11 +31,9 @@ import {
   CollapsibleCardProps,
   VideoPlayerProps,
 } from '../../types';
+import { VideoData } from '../../interfaces';
 
-// const fileRead = fs.readFileSync('C:\\Users\\kevin\\Videos\\L01P2.mp4');
-
-// eslint-disable-next-line no-console
-// console.log(fileRead.toString());
+const { ipcRenderer } = require('electron');
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -116,15 +107,15 @@ function Alert(props: AlertProps) {
 function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { dir, filepath } = props;
+  const { video } = props;
 
   return (
     <div className={classes.videobutton}>
-      {filepath}
+      {video.name}
       <IconButton
         color="primary"
         aria-label="Select"
-        onClick={() => dispatch(setVideo(`${dir}\\${filepath}`))}
+        onClick={() => dispatch(setVideo(video))}
       >
         <PlayCircleOutlineIcon />
       </IconButton>
@@ -142,44 +133,37 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 }
 
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
-  const { dir } = props;
-  const [files, setFiles] = useState<string[]>([]);
+  const { course } = props;
+
+  const wkspace = useSelector(getCurrentTerm);
+  const [files, setFiles] = useState<VideoData[]>([]);
+
+  ipcRenderer.on('return-videos', (_event, videos) => {
+    setFiles(videos);
+  });
 
   useEffect(() => {
-    fs.readdir(dir, (_err, found) => {
-      found.forEach((f) => {
-        if (f.endsWith('.mp4')) {
-          setFiles((old) => [...old, f]);
-        }
-      });
-    });
-  }, []);
+    ipcRenderer.send('get-videos', wkspace, course);
+  }, [course, wkspace]);
 
   return (
     <div className={styles.wrapcollabsible}>
       <input
         key={Math.random()}
-        id={`${dir.toString()}-collapsible`}
+        id={`${course.toString()}-collapsible`}
         className={styles.toggle}
         type="checkbox"
       />
       <label
-        htmlFor={`${dir.toString()}-collapsible`}
+        htmlFor={`${course.toString()}-collapsible`}
         className={styles.lbltoggle}
       >
-        {dir}
+        {course}
       </label>
       <div className={styles.collapsiblecontent}>
         <div className={styles.contentinner}>
-          {/* <p>
-            QUnit is by calling one of the object that are embedded in
-            JavaScript, and faster JavaScript program could also used with its
-            elegant, well documented, and functional programming using JS, HTML
-            pages Modernizr is a popular browsers without plug-ins. Test-Driven
-            Development.
-          </p> */}
           {files.map((file) => (
-            <CollapsibleCard dir={dir} filepath={file} key={file} />
+            <CollapsibleCard video={file} key={Math.random()} />
           ))}
         </div>
       </div>
@@ -189,15 +173,14 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
 
 export default function Video() {
   const dispatch = useDispatch();
-  const paths = useSelector(getPathURLS);
   const curVideo = useSelector(getCurrentVideo);
   const snackbar = useSelector(isSnackBarActive);
   const snackbarMessage = useSelector(getSnackBarMessage);
   const severity = useSelector(getSnackBarSeverity);
   const classes = useStyles();
   const [menuExpanded, setMenuExpanded] = useState<boolean>(true);
-  const [showAdd, setShowAdd] = useState<boolean>(false);
-  const [pathToAdd, setPathToAdd] = useState<string>('');
+
+  const currentCourses = useSelector(getCurrentCourses);
 
   return (
     <div className={classes.root}>
@@ -221,7 +204,7 @@ export default function Video() {
             {menuExpanded ? (
               <div>
                 <div className={classes.selectiontop}>
-                  <IconButton
+                  {/* <IconButton
                     color="primary"
                     aria-label="Select"
                     onClick={() => setShowAdd(!showAdd)}
@@ -231,7 +214,7 @@ export default function Video() {
                     ) : (
                       <AddCircleOutlineIcon />
                     )}
-                  </IconButton>
+                  </IconButton> */}
                   <IconButton
                     color="primary"
                     aria-label="Select"
@@ -240,7 +223,7 @@ export default function Video() {
                     <ChevronLeftIcon />
                   </IconButton>
                 </div>
-                <Collapse in={showAdd}>
+                {/* <Collapse in={showAdd}>
                   <div
                     style={{
                       marginBottom: '10px',
@@ -266,10 +249,10 @@ export default function Video() {
                       <CreateNewFolderIcon />
                     </IconButton>
                   </div>
-                </Collapse>
+                </Collapse> */}
 
-                {paths.map((dir: string) => (
-                  <MyCollapsible key={dir} dir={dir} />
+                {currentCourses.map((dir: string) => (
+                  <MyCollapsible key={dir} course={dir} />
                 ))}
               </div>
             ) : (
@@ -285,8 +268,8 @@ export default function Video() {
         </Grid>
         <Grid item xs={menuExpanded ? 9 : 11}>
           <Paper className={classes.videocontainer}>
-            {curVideo}
-            <VideoPlayer filepath={curVideo} />
+            {curVideo.name}
+            <VideoPlayer filepath={curVideo.videoPath} />
           </Paper>
         </Grid>
       </Grid>

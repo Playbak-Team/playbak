@@ -199,7 +199,7 @@ export default function Profile() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    ipcRenderer.on('return-courses', (_event: any, courses: string[]) => {
+    ipcRenderer.on('return-courses', (_, courses: string[]) => {
       dispatch(setCourses(Object.values(courses)));
     });
   }, []);

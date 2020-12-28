@@ -1,10 +1,11 @@
+import { VideoData } from '../interfaces';
+
 type CollapsibleProps = {
-  dir: string;
+  course: string;
 };
 
 type CollapsibleCardProps = {
-  dir: string;
-  filepath: string;
+  video: VideoData;
 };
 
 type VideoPlayerProps = {
