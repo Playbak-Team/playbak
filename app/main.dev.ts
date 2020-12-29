@@ -18,12 +18,14 @@ import installExtension, {
   REDUX_DEVTOOLS,
   REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer';
-import writeJsonFile from 'write-json-file';
 import MenuBuilder from './menu';
 import { emptySettings, ProfileStateInterface } from './interfaces';
 
 const fs = require('fs');
+const ffmpeg = require('@ffmpeg-installer/ffmpeg');
 const folders = require('./utils/playbakFolders');
+
+console.log(ffmpeg.path.replace('.asar', '.asar.unpacked'));
 
 ipcMain.on('init', async (event) => {
   if (!fs.existsSync(folders.settingFile)) {
@@ -81,9 +83,12 @@ ipcMain.on('create-new-workspace', async (event, name: string) => {
         if (err) throw err;
       }
     );
-    await writeJsonFile(folders.getWorkspaceSettingFile(name), {
-      courses: [],
-    });
+    fs.writeFileSync(
+      folders.getWorkspaceSettingFile(name),
+      JSON.stringify({
+        courses: [],
+      })
+    );
     event.reply('created-workspace', name);
   }
 });
@@ -118,9 +123,9 @@ ipcMain.on(
 
           newSettings.courses.push(coursename);
 
-          await writeJsonFile(
+          fs.writeFileSync(
             folders.getWorkspaceSettingFile(wkspace),
-            newSettings
+            JSON.stringify(newSettings)
           );
         }
       );
@@ -161,7 +166,7 @@ export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
+    // autoUpdater.checkForUpdatesAndNotify();
   }
 }
 
