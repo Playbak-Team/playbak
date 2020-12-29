@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-cycle
-// import { ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 // eslint-disable-next-line import/no-cycle
 import { RootState } from '../../store';
 
@@ -17,20 +17,20 @@ const kanbanSlice = createSlice({
   reducers: {
     addColumn: (state, action: PayloadAction<string>) => {
       state.columns.push(action.payload);
-      // db call here
+      ipcRenderer.send('save-columns', Object.values(state.columns));
     },
     setColumns: (state, action: PayloadAction<string[]>) => {
       state.columns = action.payload;
-      // db call here
+      ipcRenderer.send('save-columns', action.payload);
     },
     removeColumn: (state, action: PayloadAction<string>) => {
       if (state.columns.includes(action.payload)) {
         state.columns.splice(state.columns.indexOf(action.payload), 1);
-        // db call here
       }
       state.entries = state.entries.filter(
         (e) => e.split(',')[6] !== action.payload
       );
+      ipcRenderer.send('save-columns', state.columns);
     },
     addEntry: (state, action: PayloadAction<string>) => {
       state.entries.push(action.payload);

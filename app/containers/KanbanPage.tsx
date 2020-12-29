@@ -28,7 +28,7 @@ export default function ProfilePage() {
       {isLoading ? (
         <Loader />
       ) : (
-        <div>
+        <div style={{ overflow: 'hidden' }}>
           <Navbar />
           <Kanban />
         </div>

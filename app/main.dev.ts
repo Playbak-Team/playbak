@@ -26,6 +26,8 @@ const fs = require('fs');
 const sqlite3 = require('sqlite3');
 const folders = require('./utils/playbakFolders');
 
+let globalWorkspace = '';
+
 interface Settings {
   name: string;
   LST: string;
@@ -63,11 +65,31 @@ const getEvents = (db) => {
   });
 };
 
+ipcMain.on('save-columns', async (event, columns: string[]) => {
+  const db = await new sqlite3.Database(
+    folders.getWorkspaceKanbandb(globalWorkspace),
+    (err: Error | null) => {
+      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+    }
+  );
+
+  await db.serialize(async () => {
+    db.run('DELETE FROM columns');
+    if (columns.length !== 0) {
+      db.run(
+        `INSERT INTO columns VALUES ${columns.map((v) => `("${v}")`).join()}`
+      );
+    }
+  });
+
+  db.close();
+});
+
 ipcMain.on('load-kanban', async (event, workspace: string) => {
   const db = await new sqlite3.Database(
-    `./workspaces/${workspace}/kanban.db`,
+    folders.getWorkspaceKanbandb(workspace),
     (err: Error | null) => {
-      if (err) throw err;
+      if (err) throw folders.getWorkspaceKanbandb(workspace);
     }
   );
 
@@ -101,6 +123,7 @@ ipcMain.on('init', async (event) => {
 });
 
 ipcMain.on('save-settings', async (_event, settings: ProfileStateInterface) => {
+  globalWorkspace = settings.selectedWorkspace;
   fs.writeFileSync(
     folders.settingFile,
     JSON.stringify({
@@ -114,6 +137,7 @@ ipcMain.on('save-settings', async (_event, settings: ProfileStateInterface) => {
 });
 
 ipcMain.on('get-courses', async (event, wkspace: string) => {
+  globalWorkspace = wkspace;
   fs.readFile(
     folders.getWorkspaceSettingFile(wkspace),
     async (err: Error | null, data: string) => {
@@ -149,7 +173,7 @@ ipcMain.on('create-new-workspace', async (event, name: string) => {
 
     // eslint-disable-next-line prefer-const
     const db = new sqlite3.Database(
-      `./workspaces/${name}/kanban.db`,
+      folders.getWorkspaceKanbandb(name),
       (err: Error | null) => {
         if (err) throw err;
       }

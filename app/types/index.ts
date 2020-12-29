@@ -29,14 +29,18 @@ type ColumnDivProps = {
   entries: string[] | undefined;
   addE: any;
   removeC: any;
+  index: number;
+  openCardInfo: (info: string) => any;
 };
 
 type DragProgs = {
+  type: string;
   source: any;
   destination: any;
 };
 
 type EntryCardProps = {
+  og: string;
   id: number;
   title: string;
   subtitle: string;
@@ -45,6 +49,7 @@ type EntryCardProps = {
   duedate: string;
   belongsto: string;
   index: number;
+  openCardInfo: (info: string) => any;
 };
 
 export {
