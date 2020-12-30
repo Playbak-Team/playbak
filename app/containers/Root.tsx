@@ -1,5 +1,5 @@
 import React from 'react';
-import { Provider } from 'react-redux';
+import { Provider, ReactReduxContext } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import { hot } from 'react-hot-loader/root';
 import { History } from 'history';
@@ -13,7 +13,7 @@ type Props = {
 
 const Root = ({ store, history }: Props) => (
   <Provider store={store}>
-    <ConnectedRouter history={history}>
+    <ConnectedRouter history={history} context={ReactReduxContext}>
       <Routes />
     </ConnectedRouter>
   </Provider>

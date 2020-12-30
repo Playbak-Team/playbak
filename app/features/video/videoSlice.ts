@@ -39,7 +39,7 @@ const videoSlice = createSlice({
     setVideo: (state, action: PayloadAction<VideoData>) => {
       state.currentVideo = action.payload;
       state.snackbarActive = true;
-      state.snackbarMessage = `Video set to ${action.payload}`;
+      state.snackbarMessage = `Video set to ${action.payload.name}`;
       state.snackbarSeverity = 'success';
     },
   },
