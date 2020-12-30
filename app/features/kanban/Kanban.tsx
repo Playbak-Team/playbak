@@ -20,6 +20,7 @@ import {
   setColumns,
   replaceEntry,
   setEntries,
+  removeEntry,
 } from './kanbanSlice';
 import EditEntry from './EditEntry';
 import ColumnCard from './ColumnCard';
@@ -110,6 +111,10 @@ export default function KanBan() {
     items.delete(name);
     setItems(new Map(items));
     dispatch(removeColumn(name));
+  }
+
+  function removeE(name: string) {
+    dispatch(removeEntry(name));
   }
 
   function openCardInfo(info: string) {
@@ -254,6 +259,7 @@ export default function KanBan() {
                   removeC={removeC}
                   index={index}
                   openCardInfo={openCardInfo}
+                  removeE={removeE}
                 />
               ))}
               {provided.placeholder}

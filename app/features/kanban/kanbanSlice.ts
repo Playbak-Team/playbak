@@ -48,6 +48,10 @@ const kanbanSlice = createSlice({
       state.entries[a] = b;
       ipcRenderer.send('replace-entry', b);
     },
+    removeEntry: (state, action: PayloadAction<string>) => {
+      state.entries.splice(state.entries.indexOf(action.payload), 1);
+      ipcRenderer.send('delete-entry', action.payload);
+    },
   },
 });
 
@@ -58,6 +62,7 @@ export const {
   addEntry,
   setEntries,
   replaceEntry,
+  removeEntry,
 } = kanbanSlice.actions;
 
 export default kanbanSlice.reducer;

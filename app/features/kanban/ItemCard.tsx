@@ -50,7 +50,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 });
 
 const ItemCard = (props: EntryCardProps) => {
-  const { og, id, title, duedate, index, openCardInfo } = props;
+  const { og, id, title, duedate, index, openCardInfo, removeE } = props;
   const classes = useStyles();
   const [urgent, setUrgent] = useState(false);
 
@@ -88,17 +88,20 @@ const ItemCard = (props: EntryCardProps) => {
                 }}
               >
                 <h3 className={classes.cardEntryTitle}>{title}</h3>
-                <IconButton
-                  onClick={() => openCardInfo(og)}
-                  style={{ marginTop: '-10px', marginRight: '-10px' }}
-                >
-                  <EditIcon color="secondary" />
-                </IconButton>
-                <IconButton
-                  style={{ marginTop: '-10px', marginRight: '-10px' }}
-                >
-                  <HighlightOffIcon />
-                </IconButton>
+                <div>
+                  <IconButton
+                    onClick={() => openCardInfo(og)}
+                    style={{ marginTop: '-10px', marginRight: '-10px' }}
+                  >
+                    <EditIcon color="secondary" />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => removeE(og)}
+                    style={{ marginTop: '-10px', marginRight: '-10px' }}
+                  >
+                    <HighlightOffIcon />
+                  </IconButton>
+                </div>
               </div>
               <div
                 style={{

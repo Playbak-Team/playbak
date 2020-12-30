@@ -32,6 +32,7 @@ type ColumnDivProps = {
   removeC: (name: string) => void;
   index: number;
   openCardInfo: (info: string) => void;
+  removeE: (name: string) => void;
 };
 
 type DragProps = {
@@ -51,6 +52,7 @@ type EntryCardProps = {
   belongsto: string;
   index: number;
   openCardInfo: (info: string) => void;
+  removeE: (name: string) => void;
 };
 
 type EditEntryProps = {

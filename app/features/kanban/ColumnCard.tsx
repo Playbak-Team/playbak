@@ -77,7 +77,7 @@ const getColStyle = (isDragging, draggableStyle) => ({
 });
 
 const ColumnCard = (props: ColumnDivProps) => {
-  const { name, entries, addE, removeC, index, openCardInfo } = props;
+  const { name, entries, addE, removeC, index, openCardInfo, removeE } = props;
   const classes = useStyles();
 
   return (
@@ -125,6 +125,7 @@ const ColumnCard = (props: ColumnDivProps) => {
                               belongsto={ob.split(',')[6]}
                               index={i2}
                               openCardInfo={openCardInfo}
+                              removeE={removeE}
                             />
                           </div>
                         ))
