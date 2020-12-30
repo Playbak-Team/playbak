@@ -20,36 +20,11 @@ import installExtension, {
 } from 'electron-devtools-installer';
 import writeJsonFile from 'write-json-file';
 import MenuBuilder from './menu';
-import { emptySettings, ProfileStateInterface } from './interfaces';
 
 const fs = require('fs');
 const folders = require('./utils/playbakFolders');
 
-ipcMain.on('init', async (event) => {
-  if (!fs.existsSync(folders.settingFile)) {
-    fs.writeFileSync(folders.settingFile, JSON.stringify(emptySettings()));
-  }
-  fs.readFile(folders.settingFile, async (err: Error | null, data: string) => {
-    if (err) throw err;
-
-    const settings = JSON.parse(data);
-
-    event.reply('return-settings', settings);
-  });
-});
-
-ipcMain.on('save-settings', async (_event, settings: ProfileStateInterface) => {
-  fs.writeFileSync(
-    folders.settingFile,
-    JSON.stringify({
-      name: settings.name,
-      LST: settings.selectedWorkspace,
-      LL: '',
-      AWKS: Object.values(settings.availableWorkspaces),
-      courses: Object.values(settings.courses),
-    })
-  );
-});
+require('./utils/mainIpc');
 
 ipcMain.on('get-courses', async (event, wkspace: string) => {
   fs.readFile(
@@ -62,30 +37,6 @@ ipcMain.on('get-courses', async (event, wkspace: string) => {
       event.reply('return-courses', settings.courses);
     }
   );
-});
-
-ipcMain.on('create-new-workspace', async (event, name: string) => {
-  if (!fs.existsSync(folders.workspaceRootDir)) {
-    await fs.mkdir(
-      folders.workspaceRootDir,
-      (err: Error | null, _data: any) => {
-        if (err) throw err;
-      }
-    );
-  }
-
-  if (!fs.existsSync(folders.getWorkspaceDir(name))) {
-    await fs.mkdir(
-      folders.getWorkspaceDir(name),
-      (err: Error | null, _data: any) => {
-        if (err) throw err;
-      }
-    );
-    await writeJsonFile(folders.getWorkspaceSettingFile(name), {
-      courses: [],
-    });
-    event.reply('created-workspace', name);
-  }
 });
 
 ipcMain.on(
