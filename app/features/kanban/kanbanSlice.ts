@@ -19,9 +19,10 @@ const kanbanSlice = createSlice({
       state.columns.push(action.payload);
       ipcRenderer.send('save-columns', Object.values(state.columns));
     },
-    setColumns: (state, action: PayloadAction<string[]>) => {
-      state.columns = action.payload;
-      ipcRenderer.send('save-columns', action.payload);
+    setColumns: (state, action: PayloadAction<[string[], boolean]>) => {
+      const [newValue, toSave] = action.payload;
+      state.columns = newValue;
+      if (toSave) ipcRenderer.send('save-columns', newValue);
     },
     removeColumn: (state, action: PayloadAction<string>) => {
       if (state.columns.includes(action.payload)) {
@@ -30,13 +31,22 @@ const kanbanSlice = createSlice({
       state.entries = state.entries.filter(
         (e) => e.split(',')[6] !== action.payload
       );
-      ipcRenderer.send('save-columns', state.columns);
+      ipcRenderer.send('remove-columns', action.payload);
+      ipcRenderer.send('save-entries', action.payload);
     },
     addEntry: (state, action: PayloadAction<string>) => {
       state.entries.push(action.payload);
+      ipcRenderer.send('add-entry', action.payload);
     },
-    setEntries: (state, action: PayloadAction<string[]>) => {
-      state.entries = action.payload;
+    setEntries: (state, action: PayloadAction<[string[], boolean]>) => {
+      const [newValue, toSave] = action.payload;
+      state.entries = newValue;
+      if (toSave) ipcRenderer.send('save-entries', newValue);
+    },
+    replaceEntry: (state, action: PayloadAction<[number, string]>) => {
+      const [a, b]: [number, string] = action.payload;
+      state.entries[a] = b;
+      ipcRenderer.send('replace-entry', b);
     },
   },
 });
@@ -47,6 +57,7 @@ export const {
   removeColumn,
   addEntry,
   setEntries,
+  replaceEntry,
 } = kanbanSlice.actions;
 
 export default kanbanSlice.reducer;

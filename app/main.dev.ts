@@ -28,13 +28,6 @@ const folders = require('./utils/playbakFolders');
 
 let globalWorkspace = '';
 
-interface Settings {
-  name: string;
-  LST: string;
-  LL: string;
-  AWKS: string[];
-}
-
 interface Columns {
   name: string;
 }
@@ -51,21 +44,44 @@ interface Events {
 
 const getColumns = (db) => {
   return new Promise<Columns[]>((resolve) => {
-    db.all('SELECT name FROM columns', (_err: Error | null, data: any) => {
-      resolve(data);
-    });
+    db.all(
+      'SELECT name FROM columns',
+      (
+        _err: Error | null,
+        data: Columns[] | PromiseLike<Columns[]> | undefined
+      ) => {
+        resolve(data);
+      }
+    );
   });
 };
 
 const getEvents = (db) => {
   return new Promise<Events[]>((resolve) => {
-    db.all('SELECT * FROM entry', (_err: Error | null, data: any) => {
-      resolve(data);
-    });
+    db.all(
+      'SELECT * FROM entry',
+      (
+        _err: Error | null,
+        data: Events[] | PromiseLike<Events[]> | undefined
+      ) => {
+        resolve(data);
+      }
+    );
   });
 };
 
-ipcMain.on('save-columns', async (event, columns: string[]) => {
+const mapEntries = async (entries) => {
+  return Promise.all(
+    entries.map(
+      (v) =>
+        `(?,"${v.split(',')[1]}","${v.split(',')[2]}","${v.split(',')[3]}","${
+          v.split(',')[4]
+        }","${v.split(',')[5]}","${v.split(',')[6]}")`
+    )
+  );
+};
+
+ipcMain.on('save-columns', async (_event, columns: string[]) => {
   const db = await new sqlite3.Database(
     folders.getWorkspaceKanbandb(globalWorkspace),
     (err: Error | null) => {
@@ -83,6 +99,90 @@ ipcMain.on('save-columns', async (event, columns: string[]) => {
   });
 
   db.close();
+});
+
+ipcMain.on('remove-columns', async (_event, column: string) => {
+  const db = await new sqlite3.Database(
+    folders.getWorkspaceKanbandb(globalWorkspace),
+    (err: Error | null) => {
+      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+    }
+  );
+  await db.serialize(async () => {
+    db.run(`DELETE FROM columns WHERE name = "${column}"`);
+  });
+  db.close();
+});
+
+ipcMain.on('add-entry', async (_event, entry: string) => {
+  const db = await new sqlite3.Database(
+    folders.getWorkspaceKanbandb(globalWorkspace),
+    (err: Error | null) => {
+      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+    }
+  );
+  await db.serialize(async () => {
+    const v = entry.split(',');
+    db.run(
+      `INSERT INTO entry VALUES (${v[0]},"${v[1]}","${v[2]}","${v[3]}","${v[4]}","${v[5]}","${v[6]}")`
+    );
+  });
+  db.close();
+});
+
+ipcMain.on('save-entries', async (_event, entries: string[]) => {
+  const mapped = await mapEntries(entries);
+
+  const db = await new sqlite3.Database(
+    folders.getWorkspaceKanbandb(globalWorkspace),
+    (err: Error | null) => {
+      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+    }
+  );
+
+  await db.serialize(async () => {
+    await db.run('DELETE FROM entry');
+
+    // await db.run('DELETE FROM sqlite_sequence');
+
+    await db.run(`INSERT INTO entry VALUES ${mapped}`);
+  });
+
+  db.close();
+});
+
+ipcMain.on('delete-entry', async (_event, entry: string) => {
+  const db = await new sqlite3.Database(
+    folders.getWorkspaceKanbandb(globalWorkspace),
+    (err: Error | null) => {
+      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+    }
+  );
+  db.serialize(async () => {
+    db.run(`DELETE FROM entry WHERE id=${entry.split(',')[0]}`);
+  });
+
+  db.close();
+});
+
+ipcMain.on('replace-entry', async (event, entry: string) => {
+  const db = await new sqlite3.Database(
+    folders.getWorkspaceKanbandb(globalWorkspace),
+    (err: Error | null) => {
+      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+    }
+  );
+  const v = entry.split(',');
+  await db.serialize(() => {
+    db.run(
+      `UPDATE entry SET title= "${v[1]}", subtitle="${v[2]}", description="${v[3]}", label="${v[4]}", duedate="${v[5]}", belongsto="${v[6]}" WHERE id=${v[0]}`
+    );
+  });
+  db.close();
+  event.reply(
+    'yikes',
+    `UPDATE entry SET title= "${v[1]}", subtitle="${v[2]}", description="${v[3]}", label="${v[4]}", duedate="${v[5]}", belongsto="${v[6]}" WHERE id=${v[0]}`
+  );
 });
 
 ipcMain.on('load-kanban', async (event, workspace: string) => {
@@ -105,6 +205,7 @@ ipcMain.on('load-kanban', async (event, workspace: string) => {
 
     event.reply('kanban-data', [c, e]);
 
+    db.close();
     // const events = await getEvents(db);
   });
 });
@@ -152,21 +253,16 @@ ipcMain.on('get-courses', async (event, wkspace: string) => {
 
 ipcMain.on('create-new-workspace', async (event, name: string) => {
   if (!fs.existsSync(folders.workspaceRootDir)) {
-    await fs.mkdir(
-      folders.workspaceRootDir,
-      (err: Error | null, _data: any) => {
-        if (err) throw err;
-      }
-    );
+    await fs.mkdir(folders.workspaceRootDir, (err: Error | null) => {
+      if (err) throw err;
+    });
   }
 
   if (!fs.existsSync(folders.getWorkspaceDir(name))) {
-    await fs.mkdir(
-      folders.getWorkspaceDir(name),
-      (err: Error | null, _data: any) => {
-        if (err) throw err;
-      }
-    );
+    await fs.mkdir(folders.getWorkspaceDir(name), (err: Error | null) => {
+      if (err) throw err;
+    });
+
     await writeJsonFile(folders.getWorkspaceSettingFile(name), {
       courses: [],
     });

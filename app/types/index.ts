@@ -1,3 +1,4 @@
+import type { DraggableLocation } from 'react-beautiful-dnd';
 import { VideoData } from '../interfaces';
 
 type CollapsibleProps = {
@@ -27,16 +28,16 @@ type CourseEntryProps = {
 type ColumnDivProps = {
   name: string;
   entries: string[] | undefined;
-  addE: any;
-  removeC: any;
+  addE: (name: string) => void;
+  removeC: (name: string) => void;
   index: number;
-  openCardInfo: (info: string) => any;
+  openCardInfo: (info: string) => void;
 };
 
-type DragProgs = {
+type DragProps = {
   type: string;
-  source: any;
-  destination: any;
+  source: DraggableLocation;
+  destination: DraggableLocation | null;
 };
 
 type EntryCardProps = {
@@ -49,7 +50,15 @@ type EntryCardProps = {
   duedate: string;
   belongsto: string;
   index: number;
-  openCardInfo: (info: string) => any;
+  openCardInfo: (info: string) => void;
+};
+
+type EditEntryProps = {
+  index: number;
+  entry: string;
+  handleEntryClose: () => void;
+  showSelectedEntry: boolean;
+  handleEntrySave: (index: number, newEntry: string) => void;
 };
 
 export {
@@ -61,5 +70,6 @@ export {
   CourseEntryProps,
   ColumnDivProps,
   EntryCardProps,
-  DragProgs,
+  DragProps,
+  EditEntryProps,
 };
