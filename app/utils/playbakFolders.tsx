@@ -14,6 +14,8 @@ exports.getWorkspaceSettingFile = (wkspace: string) =>
   path.resolve(`${userdataDir}/${wkspace}-settings.json`);
 exports.getWorkspaceDir = (wkspace: string) =>
   path.resolve(`${workspaceRootDir}/${wkspace}`);
+exports.getWorkspaceKanbandb = (wkspace: string) =>
+  path.resolve(`${workspaceRootDir}/${wkspace}/kanban.db`);
 
 exports.getCourseRootDir = (wkspace: string, course: string) =>
   path.resolve(`${workspaceRootDir}/${wkspace}/${course}`);

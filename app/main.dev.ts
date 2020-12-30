@@ -19,37 +19,12 @@ import installExtension, {
   REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer';
 import MenuBuilder from './menu';
-import { emptySettings, ProfileStateInterface } from './interfaces';
 
 const fs = require('fs');
 const { exec } = require('child_process');
 const folders = require('./utils/playbakFolders');
 
-ipcMain.on('init', async (event) => {
-  if (!fs.existsSync(folders.settingFile)) {
-    fs.writeFileSync(folders.settingFile, JSON.stringify(emptySettings()));
-  }
-  fs.readFile(folders.settingFile, async (err: Error | null, data: string) => {
-    if (err) throw err;
-
-    const settings = JSON.parse(data);
-
-    event.reply('return-settings', settings);
-  });
-});
-
-ipcMain.on('save-settings', async (_event, settings: ProfileStateInterface) => {
-  fs.writeFileSync(
-    folders.settingFile,
-    JSON.stringify({
-      name: settings.name,
-      LST: settings.selectedWorkspace,
-      LL: '',
-      AWKS: Object.values(settings.availableWorkspaces),
-      courses: Object.values(settings.courses),
-    })
-  );
-});
+require('./utils/mainIpc');
 
 ipcMain.on('get-courses', async (event, wkspace: string) => {
   fs.readFile(

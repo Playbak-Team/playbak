@@ -137,9 +137,11 @@ export default function PrimarySearchAppBar() {
         <Toolbar>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton aria-label="go to kanban" color="inherit">
-              <ListAltIcon />
-            </IconButton>
+            <Link to={routes.KANBAN}>
+              <IconButton aria-label="go to kanban" color="inherit">
+                <ListAltIcon />
+              </IconButton>
+            </Link>
             <Link to={routes.VIDEO}>
               <IconButton aria-label="go to videos" color="inherit">
                 <OndemandVideoIcon />

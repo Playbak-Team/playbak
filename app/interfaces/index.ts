@@ -44,12 +44,34 @@ interface ProfileStateInterface {
   links: string[];
 }
 
+interface KanbanStateInterface {
+  columns: string[];
+  entries: string[];
+}
+
+interface Columns {
+  name: string;
+}
+
+interface Events {
+  id: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  label: string;
+  duedate: string;
+  belongsto: string;
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   VideoStateInterface,
   ProfileStateInterface,
+  KanbanStateInterface,
   VideoData,
   emptyVideoData,
   Settings,
   emptySettings,
+  Columns,
+  Events,
 };
