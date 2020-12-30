@@ -1,5 +1,4 @@
 import { ipcMain } from 'electron';
-import writeJsonFile from 'write-json-file';
 import { ProfileStateInterface, emptySettings } from '../interfaces';
 import { getColumns, getEvents, mapEntries } from './mainPromises';
 
@@ -178,9 +177,12 @@ ipcMain.on('create-new-workspace', async (event, name: string) => {
       if (err) throw err;
     });
 
-    await writeJsonFile(folders.getWorkspaceSettingFile(name), {
-      courses: [],
-    });
+    fs.writeFileSync(
+      folders.getWorkspaceSettingFile(name),
+      JSON.stringify({
+        courses: [],
+      })
+    );
 
     // eslint-disable-next-line prefer-const
     const db = new sqlite3.Database(

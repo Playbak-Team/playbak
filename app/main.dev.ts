@@ -49,18 +49,21 @@ ipcMain.on('create-new-workspace', async (event, name: string) => {
     );
   }
 
+  if (!fs.existsSync(folders.getWorkspaceSettingFile(name))) {
+    fs.writeFileSync(
+      folders.getWorkspaceSettingFile(name),
+      JSON.stringify({
+        courses: [],
+      })
+    );
+  }
+
   if (!fs.existsSync(folders.getWorkspaceDir(name))) {
     await fs.mkdir(
       folders.getWorkspaceDir(name),
       (err: Error | null, _data: any) => {
         if (err) throw err;
       }
-    );
-    fs.writeFileSync(
-      folders.getWorkspaceSettingFile(name),
-      JSON.stringify({
-        courses: [],
-      })
     );
     event.reply('created-workspace', name);
   }
