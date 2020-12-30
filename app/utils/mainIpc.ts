@@ -70,6 +70,8 @@ ipcMain.on('save-entries', async (_event, entries: string[]) => {
 
   await db.run('DELETE FROM entry');
 
+  if (entries.length === 0) return;
+
   await db.run('DELETE FROM sqlite_sequence WHERE name="entry"');
 
   await db.run(`INSERT INTO entry VALUES ${mapped}`);

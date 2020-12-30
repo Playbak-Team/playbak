@@ -85,14 +85,14 @@ const ItemCard = (props: EntryCardProps) => {
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  marginBottom: '15px',
+                  marginBottom: '10px',
                 }}
               >
                 <div
                   style={{
                     backgroundColor: 'grey',
                     maxWidth: 'max-content',
-                    maxHeight: 'max-content',
+                    maxHeight: '15px',
                     border: '1px solid grey',
                     borderRadius: '15px',
                     padding: '5px',
