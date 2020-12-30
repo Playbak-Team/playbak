@@ -239,7 +239,8 @@
     "react-router-dom": "^5.2.0",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "regenerator-runtime": "^0.13.5"
+    "regenerator-runtime": "^0.13.5",
+    "source-map-support": "^0.5.19"
   },
   "devEngines": {
     "node": ">=7.x",

@@ -20,7 +20,6 @@
     "react-beautiful-dnd": "^13.0.0",
     "react-collapsible": "^2.8.1",
     "react-indiana-drag-scroll": "^1.8.0",
-    "source-map-support": "^0.5.19",
     "sqlite3": "^5.0.0"
   },
   "devDependencies": {
