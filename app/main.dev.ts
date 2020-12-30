@@ -44,29 +44,17 @@ interface Events {
 
 const getColumns = (db) => {
   return new Promise<Columns[]>((resolve) => {
-    db.all(
-      'SELECT name FROM columns',
-      (
-        _err: Error | null,
-        data: Columns[] | PromiseLike<Columns[]> | undefined
-      ) => {
-        resolve(data);
-      }
-    );
+    db.all('SELECT name FROM columns', (_err: Error | null, data) => {
+      resolve(data);
+    });
   });
 };
 
 const getEvents = (db) => {
   return new Promise<Events[]>((resolve) => {
-    db.all(
-      'SELECT * FROM entry',
-      (
-        _err: Error | null,
-        data: Events[] | PromiseLike<Events[]> | undefined
-      ) => {
-        resolve(data);
-      }
-    );
+    db.all('SELECT * FROM entry', (_err: Error | null, data) => {
+      resolve(data);
+    });
   });
 };
 
