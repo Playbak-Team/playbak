@@ -22,10 +22,8 @@ import MenuBuilder from './menu';
 import { emptySettings, ProfileStateInterface } from './interfaces';
 
 const fs = require('fs');
-const ffmpeg = require('@ffmpeg-installer/ffmpeg');
+const { exec } = require('child_process');
 const folders = require('./utils/playbakFolders');
-
-console.log(ffmpeg.path.replace('.asar', '.asar.unpacked'));
 
 ipcMain.on('init', async (event) => {
   if (!fs.existsSync(folders.settingFile)) {
@@ -104,6 +102,7 @@ ipcMain.on(
         }
       );
       folders.courseSubDirs.forEach((subDir) => {
+        console.log(subDir(wkspace, coursename));
         if (!fs.existsSync(subDir(wkspace, coursename)))
           fs.mkdir(subDir(wkspace, coursename), (err: Error | null) => {
             if (err) throw err;
@@ -149,10 +148,20 @@ ipcMain.on('get-videos', async (event, wkspace: string, course: string) => {
             dirent.isFile() && path.extname(dirent.name) === '.mp4'
         )
         .map((dirent: typeof fs.Dirent) => {
+          const videoPath = `${videoDir}\\${dirent.name}`;
+
+          let pbsPath = `${videoDir}\\${path.basename(
+            dirent.name,
+            path.extname(dirent.name)
+          )}.pbs`;
+          if (!fs.existsSync(pbsPath)) {
+            pbsPath = '';
+          }
+
           return {
             name: dirent.name,
-            videoPath: `${videoDir}/${dirent.name}`,
-            pbsPath: '',
+            videoPath,
+            pbsPath,
             watched: false,
           };
         })
@@ -160,6 +169,19 @@ ipcMain.on('get-videos', async (event, wkspace: string, course: string) => {
   } else {
     event.reply('return-videos', []);
   }
+});
+
+ipcMain.on('run-pbsgen', async (event, filename: string) => {
+  exec(
+    `${folders.pbsgenPath} ${folders.ffmpegPath} ${filename}`,
+    (error: Error, stdout: string, stderr: string) => {
+      if (error || stderr) {
+        event.reply('return-pbsgen', '');
+      } else if (stdout) {
+        event.reply('return-pbsgen', stdout);
+      }
+    }
+  );
 });
 
 export default class AppUpdater {
