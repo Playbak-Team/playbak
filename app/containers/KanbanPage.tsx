@@ -8,7 +8,7 @@ import Kanban from '../features/kanban/Kanban';
 import Navbar from '../components/Navbar/Navbar';
 import Loader from '../components/Loader/Loader';
 
-export default function ProfilePage() {
+export default function KanbanPage() {
   const [isLoading, setLoading] = useState(true);
   const workspace = useSelector(getCurrentTerm);
   const dispatch = useDispatch();

@@ -32,7 +32,10 @@ const kanbanSlice = createSlice({
         (e) => e.split(',')[6] !== action.payload
       );
       ipcRenderer.send('remove-columns', action.payload);
-      ipcRenderer.send('save-entries', action.payload);
+      ipcRenderer.send(
+        'save-entries',
+        state.entries.filter((e) => e.split(',')[6] !== action.payload)
+      );
     },
     addEntry: (state, action: PayloadAction<string>) => {
       state.entries.push(action.payload);
