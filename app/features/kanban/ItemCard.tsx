@@ -50,7 +50,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 });
 
 const ItemCard = (props: EntryCardProps) => {
-  const { og, id, title, duedate, index, openCardInfo, removeE } = props;
+  const { og, id, title, label, duedate, index, openCardInfo, removeE } = props;
   const classes = useStyles();
   const [urgent, setUrgent] = useState(false);
 
@@ -85,9 +85,26 @@ const ItemCard = (props: EntryCardProps) => {
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
+                  marginBottom: '15px',
                 }}
               >
-                <h3 className={classes.cardEntryTitle}>{title}</h3>
+                <div
+                  style={{
+                    backgroundColor: 'grey',
+                    maxWidth: 'max-content',
+                    maxHeight: 'max-content',
+                    border: '1px solid grey',
+                    borderRadius: '15px',
+                    padding: '5px',
+                    fontSize: '12px',
+                    color: 'white',
+                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  {label}
+                </div>
                 <div>
                   <IconButton
                     onClick={() => openCardInfo(og)}
@@ -103,12 +120,13 @@ const ItemCard = (props: EntryCardProps) => {
                   </IconButton>
                 </div>
               </div>
+              <h3 className={classes.cardEntryTitle}>{title}</h3>
               <div
                 style={{
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  marginTop: '10px',
+                  marginTop: '15px',
                   backgroundColor: urgent ? '#FF8484' : 'transparent',
                   maxWidth: 'max-content',
                   padding: '3px',

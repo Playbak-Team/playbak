@@ -93,7 +93,7 @@ export default function KanBan() {
 
   function addE(name: string) {
     const nextId = entries.length + 1;
-    const toAdd = `${nextId},DefaulTitle,DefaultSub,DefaultDesc,DefaultLabel,Dec 30 2020,${name}`;
+    const toAdd = `${nextId},DefaultTitle,DefaultSub,DefaultDesc,DefaultLabel,Dec 30 2020,${name}`;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const tmp: string[] = items.get(name)!;
     setItems(new Map(items.set(name, tmp.concat([toAdd]))));

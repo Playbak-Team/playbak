@@ -134,9 +134,7 @@ export default function EditEntry(props: EditEntryProps) {
                 onChange={(e) => setDate(e.target.value)}
               />
             </div>
-            <div className={classes.dialogContentRight}>
-              dis is here for now
-            </div>
+            <div className={classes.dialogContentRight} />
           </div>
         )}
       </DialogContent>
