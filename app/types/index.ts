@@ -10,7 +10,7 @@ type CollapsibleCardProps = {
 };
 
 type VideoPlayerProps = {
-  filepath: string;
+  video: VideoData;
 };
 
 type HomeProps = {

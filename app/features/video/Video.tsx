@@ -20,6 +20,8 @@ import {
   getSnackBarMessage,
   disableSnackbar,
   getSnackBarSeverity,
+  setPBSData,
+  getPBSData,
 } from './videoSlice';
 import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
 import routes from '../../constants/routes.json';
@@ -74,7 +76,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     videobutton: {
       display: 'flex',
-      justifyContent: 'space-between',
+      // justifyContent: 'space-between',
       alignItems: 'center',
       wordWrap: 'break-word',
     },
@@ -111,7 +113,6 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
 
   return (
     <div className={classes.videobutton}>
-      {video.name}
       <IconButton
         color="primary"
         aria-label="Select"
@@ -119,28 +120,60 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
       >
         <PlayCircleOutlineIcon />
       </IconButton>
+      {video.name}
     </div>
   );
 }
 
 function VideoPlayer(props: VideoPlayerProps): JSX.Element {
-  const { filepath } = props;
+  const { video } = props;
+  const videoPlayerRef = React.createRef<HTMLVideoElement>();
+
+  const pbsData = useSelector(getPBSData);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (videoPlayerRef.current && pbsData.chunkSize !== -1) {
+        const newSpeed =
+          pbsData.speeds[
+            Math.floor(videoPlayerRef.current.currentTime / pbsData.chunkSize)
+          ];
+        if (videoPlayerRef.current.playbackRate !== newSpeed) {
+          videoPlayerRef.current.playbackRate = newSpeed;
+        }
+      }
+    }, 50);
+    return () => clearInterval(interval);
+  }, [pbsData, videoPlayerRef]);
   return (
-    <video key={filepath} controls width="100%" height="100%">
-      <source src={filepath} type="video/mp4" />
+    <video
+      key={video.videoPath}
+      controls
+      width="100%"
+      height="100%"
+      ref={videoPlayerRef}
+    >
+      <source src={video.videoPath} type="video/mp4" />
     </video>
   );
 }
 
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
+  const dispatch = useDispatch();
   const { course } = props;
 
   const wkspace = useSelector(getCurrentTerm);
   const [files, setFiles] = useState<VideoData[]>([]);
 
-  ipcRenderer.on('return-videos', (_event, videos) => {
-    setFiles(videos);
-  });
+  useEffect(() => {
+    ipcRenderer.on('return-videos', (_event, videos) => {
+      setFiles(videos);
+    });
+
+    ipcRenderer.on('return-pbs', (_event, data) => {
+      dispatch(setPBSData(data));
+    });
+  }, []);
 
   useEffect(() => {
     ipcRenderer.send('get-videos', wkspace, course);
@@ -269,7 +302,7 @@ export default function Video() {
         <Grid item xs={menuExpanded ? 9 : 11}>
           <Paper className={classes.videocontainer}>
             {curVideo.name}
-            <VideoPlayer filepath={curVideo.videoPath} />
+            <VideoPlayer video={curVideo} />
           </Paper>
         </Grid>
       </Grid>

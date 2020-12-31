@@ -21,10 +21,10 @@ import installExtension, {
 import MenuBuilder from './menu';
 
 const fs = require('fs');
-const { exec } = require('child_process');
 const folders = require('./utils/playbakFolders');
 
 require('./utils/mainIpc');
+require('./utils/pbsgenIpc');
 
 ipcMain.on('get-courses', async (event, wkspace: string) => {
   fs.readFile(
@@ -147,19 +147,6 @@ ipcMain.on('get-videos', async (event, wkspace: string, course: string) => {
   } else {
     event.reply('return-videos', []);
   }
-});
-
-ipcMain.on('run-pbsgen', async (event, filename: string) => {
-  exec(
-    `${folders.pbsgenPath} ${folders.ffmpegPath} ${filename}`,
-    (error: Error, stdout: string, stderr: string) => {
-      if (error || stderr) {
-        event.reply('return-pbsgen', '');
-      } else if (stdout) {
-        event.reply('return-pbsgen', stdout);
-      }
-    }
-  );
 });
 
 export default class AppUpdater {
