@@ -16,6 +16,7 @@ import Collapse from '@material-ui/core/Collapse';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import CancelRoundedIcon from '@material-ui/icons/CancelRounded';
+import { ipcRenderer } from 'electron';
 import {
   getCurrentTerm,
   setName,
@@ -28,8 +29,6 @@ import {
   setCourses,
 } from './profileSlice';
 import { WorkspaceEntryProps, CourseEntryProps } from '../../types';
-
-const { ipcRenderer } = window.require('electron');
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
