@@ -136,7 +136,8 @@ ipcMain.on('load-kanban', async (event, workspace: string) => {
   });
 });
 
-ipcMain.on('save-settings', async (_event, settings: ProfileStateInterface) => {
+ipcMain.on('save-settings', async (_event, settingsString: string) => {
+  const settings = JSON.parse(settingsString);
   globalWorkspace = settings.selectedWorkspace;
   fs.writeFileSync(
     folders.settingFile,
