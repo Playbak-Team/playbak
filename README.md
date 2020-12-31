@@ -2,12 +2,6 @@
 
 <br>
 
-<p>
-  Playbak uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/redux">Redux</a>, and <a href="https://github.com/electron-react-boilerplate/electron-react-boilerplate">ERB</a>
-</p>
-
-<br>
-
 <div align="center">
   <a href="https://facebook.github.io/react/"><img src="./internals/img/react-padded-90.png" /></a>
   <a href="https://redux.js.org/"><img src="./internals/img/redux-padded-90.png" /></a>
@@ -19,11 +13,6 @@
 <br />
 
 <div align="center">
-
-[![Build Status][github-actions-status]][github-actions-url]
-[![Dependency Status][david-image]][david-url]
-[![DevDependency Status][david-dev-image]][david-dev-url]
-[![Github Tag][github-tag-image]][github-tag-url]
 
 </div>
 
@@ -37,5 +26,3 @@
 [david-url]: https://david-dm.org/electron-react-boilerplate/electron-react-boilerplate
 [david-dev-image]: https://img.shields.io/david/dev/electron-react-boilerplate/electron-react-boilerplate.svg?label=devDependencies
 [david-dev-url]: https://david-dm.org/electron-react-boilerplate/electron-react-boilerplate?type=dev
-[good-first-issue-image]: https://img.shields.io/github/issues/electron-react-boilerplate/electron-react-boilerplate/good%20first%20issue.svg?label=good%20first%20issues
-[good-first-issue-url]: https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues?q=is%3Aopen+is%3Aissue+label%3A"good+first+issue"
