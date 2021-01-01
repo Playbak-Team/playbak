@@ -202,7 +202,10 @@ export default function Profile() {
     ipcRenderer.on('return-courses', (_, courses: string[]) => {
       dispatch(setCourses(Object.values(courses)));
     });
-  }, []);
+    return () => {
+      ipcRenderer.removeAllListeners('return-courses');
+    };
+  }, [dispatch]);
 
   return (
     <div className={classes.root}>

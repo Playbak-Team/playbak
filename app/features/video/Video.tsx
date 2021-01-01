@@ -164,6 +164,9 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
     ipcRenderer.on('return-videos', (_event, videos) => {
       setFiles(videos);
     });
+    return () => {
+      ipcRenderer.removeAllListeners('return-videos');
+    };
   }, []);
 
   useEffect(() => {
@@ -211,6 +214,11 @@ export default function Video() {
     ipcRenderer.on('return-pbs', (_event, data) => {
       setPBSData(data);
     });
+    return () => {
+      ipcRenderer.removeAllListeners('return-pbs');
+    };
+  }, []);
+  useEffect(() => {
     if (curVideo.pbsPath) {
       ipcRenderer.send('read-pbs', curVideo.pbsPath);
     }
