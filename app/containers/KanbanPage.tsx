@@ -22,6 +22,9 @@ export default function KanbanPage() {
       dispatch(setEntries([res[1], false]));
       setLoading(false);
     });
+    return () => {
+      ipcRenderer.removeAllListeners('kanban-data');
+    };
   }, [isLoading, workspace, dispatch]);
 
   return (

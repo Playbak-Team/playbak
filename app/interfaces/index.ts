@@ -28,6 +28,18 @@ const emptySettings = (): Settings => ({
   AWKS: [],
 });
 
+interface PBSData {
+  name: string;
+  chunkSize: number;
+  speeds: number[];
+}
+
+const emptyPBSData = (): PBSData => ({
+  name: '',
+  chunkSize: -1,
+  speeds: [],
+});
+
 interface VideoStateInterface {
   videoURLS: string[];
   currentVideo: VideoData;
@@ -74,4 +86,6 @@ export {
   emptySettings,
   Columns,
   Events,
+  PBSData,
+  emptyPBSData,
 };

@@ -19,28 +19,34 @@ export default function HomePage() {
   const name = useSelector(getName);
   // const workspace = useSelector(getCurrentTerm);
 
-  ipcRenderer.on('return-courses', (_, courses: string[]) => {
-    dispatch(setCourses(Object.values(courses)));
-    setLoading(false);
-  });
-
-  ipcRenderer.on('return-settings', (_event, settings: Settings) => {
-    dispatch(
-      setProfile({
-        name: settings.name,
-        selectedWorkspace: settings.LST,
-        availableWorkspaces: Object.values(settings.AWKS),
-        courses: settings.courses,
-        links: [],
-      })
-    );
-
-    if (settings.LST !== '') {
-      ipcRenderer.send('get-courses', settings.LST);
-    } else {
+  useEffect(() => {
+    ipcRenderer.on('return-courses', (_, courses: string[]) => {
+      dispatch(setCourses(Object.values(courses)));
       setLoading(false);
-    }
-  });
+    });
+
+    ipcRenderer.on('return-settings', (_event, settings: Settings) => {
+      dispatch(
+        setProfile({
+          name: settings.name,
+          selectedWorkspace: settings.LST,
+          availableWorkspaces: Object.values(settings.AWKS),
+          courses: settings.courses,
+          links: [],
+        })
+      );
+
+      if (settings.LST !== '') {
+        ipcRenderer.send('get-courses', settings.LST);
+      } else {
+        setLoading(false);
+      }
+    });
+    return () => {
+      ipcRenderer.removeAllListeners('return-courses');
+      ipcRenderer.removeAllListeners('return-settings');
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     ipcRenderer.send('init');

@@ -1,5 +1,5 @@
 import type { DraggableLocation } from 'react-beautiful-dnd';
-import { VideoData } from '../interfaces';
+import { PBSData, VideoData } from '../interfaces';
 
 type CollapsibleProps = {
   course: string;
@@ -10,7 +10,8 @@ type CollapsibleCardProps = {
 };
 
 type VideoPlayerProps = {
-  filepath: string;
+  video: VideoData;
+  pbsData: PBSData;
 };
 
 type HomeProps = {
