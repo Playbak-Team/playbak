@@ -235,7 +235,7 @@
     "electron-log": "^4.2.4",
     "electron-updater": "^4.3.4",
     "history": "^4.7.2",
-    "react": "^17.0.1",
+    "react": "^16.13.1",
     "react-beautiful-dnd": "^13.0.0",
     "react-collapsible": "^2.8.1",
     "react-dom": "^16.12.0",
