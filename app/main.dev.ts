@@ -115,34 +115,43 @@ ipcMain.on(
 ipcMain.on('get-videos', async (event, wkspace: string, course: string) => {
   const videoDir = folders.getCourseVideoDir(wkspace, course);
   if (fs.existsSync(videoDir) && fs.lstatSync(videoDir).isDirectory()) {
-    event.reply(
-      'return-videos',
-      fs
-        .readdirSync(videoDir, {
-          withFileTypes: true,
-        })
-        .filter(
-          (dirent: typeof fs.Dirent) =>
-            dirent.isFile() && path.extname(dirent.name) === '.mp4'
-        )
-        .map((dirent: typeof fs.Dirent) => {
-          const videoPath = `${videoDir}\\${dirent.name}`;
+    fs.readdir(
+      videoDir,
+      {
+        withFileTypes: true,
+      },
+      (err: Error, files: fs.Dirent[]) => {
+        if (err) {
+          throw err;
+        }
+        event.reply(
+          'return-videos',
+          course,
+          files
+            .filter(
+              (dirent: typeof fs.Dirent) =>
+                dirent.isFile() && path.extname(dirent.name) === '.mp4'
+            )
+            .map((dirent: typeof fs.Dirent) => {
+              const videoPath = `${videoDir}\\${dirent.name}`;
 
-          let pbsPath = `${videoDir}\\${path.basename(
-            dirent.name,
-            path.extname(dirent.name)
-          )}.pbs`;
-          if (!fs.existsSync(pbsPath)) {
-            pbsPath = '';
-          }
+              let pbsPath = `${videoDir}\\${path.basename(
+                dirent.name,
+                path.extname(dirent.name)
+              )}.pbs`;
+              if (!fs.existsSync(pbsPath)) {
+                pbsPath = '';
+              }
 
-          return {
-            name: dirent.name,
-            videoPath,
-            pbsPath,
-            watched: false,
-          };
-        })
+              return {
+                name: dirent.name,
+                videoPath,
+                pbsPath,
+                watched: false,
+              };
+            })
+        );
+      }
     );
   } else {
     event.reply('return-videos', []);

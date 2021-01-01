@@ -9,6 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -119,6 +120,11 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
         <PlayCircleOutlineIcon />
       </IconButton>
       {video.name}
+      {!video.pbsPath && (
+        <div title="No Playback speed data found.">
+          <ErrorOutlineIcon />
+        </div>
+      )}
     </div>
   );
 }
@@ -138,7 +144,7 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
           videoPlayerRef.current.playbackRate = newSpeed;
         }
       }
-    }, 50);
+    }, 100);
     return () => clearInterval(interval);
   }, [pbsData, videoPlayerRef]);
   return (
@@ -161,8 +167,10 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
   const [files, setFiles] = useState<VideoData[]>([]);
 
   useEffect(() => {
-    ipcRenderer.on('return-videos', (_event, videos) => {
-      setFiles(videos);
+    ipcRenderer.on('return-videos', (_event, targetCourse, videos) => {
+      if (targetCourse === course) {
+        setFiles(videos);
+      }
     });
     return () => {
       ipcRenderer.removeAllListeners('return-videos');
