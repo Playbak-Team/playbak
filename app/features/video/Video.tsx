@@ -21,6 +21,8 @@ import {
   getSnackBarMessage,
   disableSnackbar,
   getSnackBarSeverity,
+  showError,
+  showSuccess,
 } from './videoSlice';
 import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
 import routes from '../../constants/routes.json';
@@ -121,9 +123,15 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
       </IconButton>
       {video.name}
       {!video.pbsPath && (
-        <div title="No Playback speed data found.">
+        <IconButton
+          color="primary"
+          aria-label="No playbak speed data found. Click to run PBSGen."
+          onClick={() => {
+            ipcRenderer.send('generate-pbs', video.videoPath);
+          }}
+        >
           <ErrorOutlineIcon />
-        </div>
+        </IconButton>
       )}
     </div>
   );
@@ -144,7 +152,7 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
           videoPlayerRef.current.playbackRate = newSpeed;
         }
       }
-    }, 100);
+    }, 50);
     return () => clearInterval(interval);
   }, [pbsData, videoPlayerRef]);
   return (
@@ -161,6 +169,8 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 }
 
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
+  const dispatch = useDispatch();
+
   const { course } = props;
 
   const wkspace = useSelector(getCurrentTerm);
@@ -172,10 +182,26 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
         setFiles(videos);
       }
     });
+    ipcRenderer.on('return-pbsgen', (_event, filename, pbsPath) => {
+      if (pbsPath) {
+        const videoIndex = files.findIndex((vid) => vid.videoPath === filename);
+        if (videoIndex >= 0) {
+          const newFiles = [...files];
+          const newVideoData = { ...newFiles[videoIndex] };
+          newVideoData.pbsPath = pbsPath;
+          dispatch(showSuccess('Playback speed data generated successfully!'));
+          newFiles[videoIndex] = newVideoData;
+          setFiles(newFiles);
+        }
+      } else {
+        dispatch(showError('Failed to generated playback speed data.'));
+      }
+    });
     return () => {
       ipcRenderer.removeAllListeners('return-videos');
+      ipcRenderer.removeAllListeners('return-pbsgen');
     };
-  }, []);
+  }, [files, course]);
 
   useEffect(() => {
     ipcRenderer.send('get-videos', wkspace, course);

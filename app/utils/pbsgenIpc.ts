@@ -11,9 +11,9 @@ ipcMain.on('generate-pbs', async (event, filename: string) => {
     `${folders.pbsgenPath} ${folders.ffmpegPath} ${filename}`,
     (error: Error, stdout: string, stderr: string) => {
       if (error || stderr) {
-        event.reply('return-pbsgen', '');
+        event.reply('return-pbsgen', filename, '');
       } else if (stdout) {
-        event.reply('return-pbsgen', stdout);
+        event.reply('return-pbsgen', filename, stdout);
       }
     }
   );
