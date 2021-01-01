@@ -43,7 +43,6 @@ const emptyPBSData = (): PBSData => ({
 interface VideoStateInterface {
   videoURLS: string[];
   currentVideo: VideoData;
-  pbsData: PBSData;
   snackbarActive: boolean;
   snackbarMessage: string;
   snackbarSeverity: 'success' | 'info' | 'warning' | 'error' | undefined;

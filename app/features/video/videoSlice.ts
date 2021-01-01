@@ -1,19 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ipcRenderer } from 'electron';
 // eslint-disable-next-line import/no-cycle
 import { RootState } from '../../store';
 import {
   VideoData,
   VideoStateInterface,
   emptyVideoData,
-  emptyPBSData,
-  PBSData,
 } from '../../interfaces';
 
 const initialState: VideoStateInterface = {
   videoURLS: [],
   currentVideo: emptyVideoData(),
-  pbsData: emptyPBSData(),
   snackbarActive: false,
   snackbarMessage: '',
   snackbarSeverity: undefined,
@@ -45,30 +41,17 @@ const videoSlice = createSlice({
       state.snackbarActive = true;
       state.snackbarMessage = `Video set to ${action.payload.name}`;
       state.snackbarSeverity = 'success';
-      if (action.payload.pbsPath) {
-        ipcRenderer.send('read-pbs', action.payload.pbsPath);
-      }
-    },
-    setPBSData: (state, action: PayloadAction<PBSData>) => {
-      state.pbsData = action.payload;
     },
   },
 });
 
-export const {
-  addToURLS,
-  setVideo,
-  disableSnackbar,
-  setPBSData,
-} = videoSlice.actions;
+export const { addToURLS, setVideo, disableSnackbar } = videoSlice.actions;
 
 export default videoSlice.reducer;
 
 export const getPathURLS = (state: RootState) => state.video.videoURLS;
 
 export const getCurrentVideo = (state: RootState) => state.video.currentVideo;
-
-export const getPBSData = (state: RootState) => state.video.pbsData;
 
 export const isSnackBarActive = (state: RootState) =>
   state.video.snackbarActive;

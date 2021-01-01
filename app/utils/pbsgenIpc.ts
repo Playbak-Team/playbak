@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { emptySettings, PBSData, emptyPBSData } from '../interfaces';
+import { emptyPBSData } from '../interfaces';
 
 const fs = require('fs');
 const readline = require('readline');

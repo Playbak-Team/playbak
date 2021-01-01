@@ -20,8 +20,6 @@ import {
   getSnackBarMessage,
   disableSnackbar,
   getSnackBarSeverity,
-  setPBSData,
-  getPBSData,
 } from './videoSlice';
 import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
 import routes from '../../constants/routes.json';
@@ -33,7 +31,7 @@ import {
   CollapsibleCardProps,
   VideoPlayerProps,
 } from '../../types';
-import { VideoData } from '../../interfaces';
+import { PBSData, VideoData, emptyPBSData } from '../../interfaces';
 
 const { ipcRenderer } = require('electron');
 
@@ -126,10 +124,8 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
 }
 
 function VideoPlayer(props: VideoPlayerProps): JSX.Element {
-  const { video } = props;
+  const { video, pbsData } = props;
   const videoPlayerRef = React.createRef<HTMLVideoElement>();
-
-  const pbsData = useSelector(getPBSData);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -159,7 +155,6 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 }
 
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
-  const dispatch = useDispatch();
   const { course } = props;
 
   const wkspace = useSelector(getCurrentTerm);
@@ -168,10 +163,6 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
   useEffect(() => {
     ipcRenderer.on('return-videos', (_event, videos) => {
       setFiles(videos);
-    });
-
-    ipcRenderer.on('return-pbs', (_event, data) => {
-      dispatch(setPBSData(data));
     });
   }, []);
 
@@ -212,8 +203,18 @@ export default function Video() {
   const severity = useSelector(getSnackBarSeverity);
   const classes = useStyles();
   const [menuExpanded, setMenuExpanded] = useState<boolean>(true);
+  const [pbsData, setPBSData] = useState<PBSData>(emptyPBSData());
 
   const currentCourses = useSelector(getCurrentCourses);
+
+  useEffect(() => {
+    ipcRenderer.on('return-pbs', (_event, data) => {
+      setPBSData(data);
+    });
+    if (curVideo.pbsPath) {
+      ipcRenderer.send('read-pbs', curVideo.pbsPath);
+    }
+  }, [curVideo]);
 
   return (
     <div className={classes.root}>
@@ -237,17 +238,6 @@ export default function Video() {
             {menuExpanded ? (
               <div>
                 <div className={classes.selectiontop}>
-                  {/* <IconButton
-                    color="primary"
-                    aria-label="Select"
-                    onClick={() => setShowAdd(!showAdd)}
-                  >
-                    {showAdd ? (
-                      <RemoveCircleOutlineIcon />
-                    ) : (
-                      <AddCircleOutlineIcon />
-                    )}
-                  </IconButton> */}
                   <IconButton
                     color="primary"
                     aria-label="Select"
@@ -256,34 +246,6 @@ export default function Video() {
                     <ChevronLeftIcon />
                   </IconButton>
                 </div>
-                {/* <Collapse in={showAdd}>
-                  <div
-                    style={{
-                      marginBottom: '10px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <TextField
-                      id="outlined-basic"
-                      label="Enter path"
-                      variant="outlined"
-                      style={{
-                        width: '100%',
-                      }}
-                      value={pathToAdd}
-                      onChange={(e) => setPathToAdd(e.target.value)}
-                    />
-                    <IconButton
-                      color="primary"
-                      aria-label="Select"
-                      onClick={() => dispatch(addToURLS(pathToAdd))}
-                    >
-                      <CreateNewFolderIcon />
-                    </IconButton>
-                  </div>
-                </Collapse> */}
-
                 {currentCourses.map((dir: string) => (
                   <MyCollapsible key={dir} course={dir} />
                 ))}
@@ -302,7 +264,7 @@ export default function Video() {
         <Grid item xs={menuExpanded ? 9 : 11}>
           <Paper className={classes.videocontainer}>
             {curVideo.name}
-            <VideoPlayer video={curVideo} />
+            <VideoPlayer video={curVideo} pbsData={pbsData} />
           </Paper>
         </Grid>
       </Grid>
