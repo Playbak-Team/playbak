@@ -48,10 +48,26 @@ function setup(
   return {
     store,
     component,
+    buttons: component.find('button'),
+    name: component.find('#user-name'),
+    currentTerm: component.find('#current-term'),
+    currentTermTop: component.find('#display-selected-term'),
   };
 }
 
-describe('Counter component', () => {
+describe('Profile component', () => {
+  it('name should be correct', () => {
+    const { name } = setup();
+    expect(name.text()).toMatch(/^bob$/);
+  });
+  it('current selected term should be correct', () => {
+    const { currentTerm } = setup();
+    expect(currentTerm.text()).toMatch(/^F20$/);
+  });
+  it('current selected term title should be correct', () => {
+    const { currentTermTop } = setup();
+    expect(currentTermTop.text()).toMatch(/^F20$/);
+  });
   it('should match exact snapshot', () => {
     const { store } = setup();
     const tree = renderer
