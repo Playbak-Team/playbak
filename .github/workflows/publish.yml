@@ -1,0 +1,34 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v1
+
+      - name: Install Node, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: |
+          yarn install
+
+      - name: Download PBSGen
+        run: |
+          curl -O -L https://github.com/Playbak-Team/pbsgen/releases/latest/download/pbsgen.zip && unzip pbsgen.zip -d resources/pbsgen
+
+      - name: Publish releases
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          yarn postinstall && yarn build && yarn electron-builder --publish always --win
