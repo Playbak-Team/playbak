@@ -1,6 +1,6 @@
 name: Test
 
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   test:
@@ -48,10 +48,10 @@ jobs:
       - name: yarn install
         run: |
           yarn install --frozen-lockfile --network-timeout 300000
-          
+
       - name: Download PBSGen
         run: curl -O -L https://github.com/Playbak-Team/pbsgen/releases/latest/download/pbsgen.zip && unzip pbsgen.zip -d resources/pbsgen
-          
+
       - name: Package & Publish
         env:
           GH_TOKEN: ${{ secrets.github_token }}
