@@ -1,0 +1,59 @@
+name: Test
+
+on: [pull_request]
+
+jobs:
+  test:
+    name: Lint and Test
+    runs-on: windows-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: yarn install
+        run: |
+          yarn install --frozen-lockfile --network-timeout 300000
+
+      - name: yarn test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          yarn package-ci
+          yarn lint
+          yarn tsc
+          yarn test
+          yarn build-e2e
+      - name: yarn test-e2e
+        run: |
+          yarn test-e2e
+  build:
+    name: Build
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: yarn install
+        run: |
+          yarn install --frozen-lockfile --network-timeout 300000
+          
+      - name: Download PBSGen
+        run: curl -O -L https://github.com/Playbak-Team/pbsgen/releases/latest/download/pbsgen.zip && unzip pbsgen.zip -d resources/pbsgen
+          
+      - name: Package & Publish
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
+        run: |
+          yarn package-ci
