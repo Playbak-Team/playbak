@@ -42,10 +42,31 @@ function setup(
   return {
     store,
     component,
+    buttons: component.find('button'),
   };
 }
 
-describe('Profile component', () => {
+describe('Kanban component', () => {
+  it('there should be a button that creates a new column', () => {
+    const { buttons } = setup();
+    expect(buttons.at(0).text()).toMatch('Add another column');
+  });
+  it('remove todo column calls removeColumn', () => {
+    const { buttons } = setup();
+    const removeColSpy = jest.spyOn(kanbanSlice, 'removeColumn');
+
+    buttons.at(1).simulate('click');
+    expect(removeColSpy).toBeCalled();
+    removeColSpy.mockRestore();
+  });
+  it('remove todo entry calls removeEntry', () => {
+    const { buttons } = setup();
+    const removeEntrySpy = jest.spyOn(kanbanSlice, 'removeEntry');
+
+    buttons.at(3).simulate('click');
+    expect(removeEntrySpy).toBeCalled();
+    removeEntrySpy.mockRestore();
+  });
   it('should match exact snapshot', () => {
     const { store } = setup();
     const tree = renderer

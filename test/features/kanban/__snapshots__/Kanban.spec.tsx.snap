@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Profile component should match exact snapshot 1`] = `
+exports[`Kanban component should match exact snapshot 1`] = `
 <div
   className="makeStyles-page-2"
 >
@@ -54,15 +54,15 @@ exports[`Profile component should match exact snapshot 1`] = `
   </button>
   <div
     className="makeStyles-root-1"
-    data-rbd-droppable-context-id="1"
+    data-rbd-droppable-context-id="4"
     data-rbd-droppable-id="board"
   >
     <div
-      aria-describedby="rbd-hidden-text-1-hidden-text-11"
+      aria-describedby="rbd-hidden-text-4-hidden-text-44"
       className="makeStyles-col-3"
-      data-rbd-drag-handle-context-id="1"
+      data-rbd-drag-handle-context-id="4"
       data-rbd-drag-handle-draggable-id="todo"
-      data-rbd-draggable-context-id="1"
+      data-rbd-draggable-context-id="4"
       data-rbd-draggable-id="todo"
       draggable={false}
       onDragStart={[Function]}
@@ -123,7 +123,7 @@ exports[`Profile component should match exact snapshot 1`] = `
       >
         <div
           className="makeStyles-container-6"
-          data-rbd-droppable-context-id="1"
+          data-rbd-droppable-context-id="4"
           data-rbd-droppable-id="todo"
           style={
             Object {
@@ -188,11 +188,11 @@ exports[`Profile component should match exact snapshot 1`] = `
       </button>
     </div>
     <div
-      aria-describedby="rbd-hidden-text-1-hidden-text-11"
+      aria-describedby="rbd-hidden-text-4-hidden-text-44"
       className="makeStyles-col-3"
-      data-rbd-drag-handle-context-id="1"
+      data-rbd-drag-handle-context-id="4"
       data-rbd-drag-handle-draggable-id="inprogress"
-      data-rbd-draggable-context-id="1"
+      data-rbd-draggable-context-id="4"
       data-rbd-draggable-id="inprogress"
       draggable={false}
       onDragStart={[Function]}
@@ -253,7 +253,7 @@ exports[`Profile component should match exact snapshot 1`] = `
       >
         <div
           className="makeStyles-container-6"
-          data-rbd-droppable-context-id="1"
+          data-rbd-droppable-context-id="4"
           data-rbd-droppable-id="inprogress"
           style={
             Object {
@@ -318,11 +318,11 @@ exports[`Profile component should match exact snapshot 1`] = `
       </button>
     </div>
     <div
-      aria-describedby="rbd-hidden-text-1-hidden-text-11"
+      aria-describedby="rbd-hidden-text-4-hidden-text-44"
       className="makeStyles-col-3"
-      data-rbd-drag-handle-context-id="1"
+      data-rbd-drag-handle-context-id="4"
       data-rbd-drag-handle-draggable-id="done"
-      data-rbd-draggable-context-id="1"
+      data-rbd-draggable-context-id="4"
       data-rbd-draggable-id="done"
       draggable={false}
       onDragStart={[Function]}
@@ -383,7 +383,7 @@ exports[`Profile component should match exact snapshot 1`] = `
       >
         <div
           className="makeStyles-container-6"
-          data-rbd-droppable-context-id="1"
+          data-rbd-droppable-context-id="4"
           data-rbd-droppable-id="done"
           style={
             Object {
