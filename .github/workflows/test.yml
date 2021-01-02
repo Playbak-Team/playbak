@@ -33,7 +33,7 @@ jobs:
   #         yarn test-e2e
   build:
     name: Build
-    if: startsWith(github.ref, 'refs/tags/')
+    # if: startsWith(github.ref, 'refs/tags/')
     # needs: test
     runs-on: windows-latest
     steps:
