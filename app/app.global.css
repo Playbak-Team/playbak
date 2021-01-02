@@ -9,7 +9,7 @@ body {
   color: white;
   height: 100vh;
   font-family: Arial, Helvetica, Helvetica Neue, serif;
-  background-image: url('../resources/bg1.jpg');
+  background-image: url('https://source.unsplash.com/random/1980x1080');
   overflow-y: hidden;
   margin: 0;
 }

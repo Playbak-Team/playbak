@@ -147,15 +147,19 @@ export default function PrimarySearchAppBar() {
                 <OndemandVideoIcon />
               </IconButton>
             </Link>
-            <IconButton aria-label="go to calendar" color="inherit">
+            <IconButton aria-label="go to calendar" color="inherit" disabled>
               <DateRangeIcon />
             </IconButton>
-            <IconButton aria-label="show 4 new mails" color="inherit">
+            <IconButton aria-label="show 4 new mails" color="inherit" disabled>
               <Badge badgeContent={0} color="secondary">
                 <MailIcon />
               </Badge>
             </IconButton>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
+            <IconButton
+              aria-label="show 17 new notifications"
+              color="inherit"
+              disabled
+            >
               <Badge badgeContent={0} color="secondary" variant="dot">
                 <NotificationsIcon />
               </Badge>

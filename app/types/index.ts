@@ -16,6 +16,7 @@ type VideoPlayerProps = {
 
 type HomeProps = {
   name: string;
+  quote: string;
 };
 
 type WorkspaceEntryProps = {
