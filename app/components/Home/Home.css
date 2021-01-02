@@ -4,16 +4,13 @@
   margin-block-start: 0;
   margin-block-end: 0;
   width: 100vw;
-  min-height: 100vh;
+  min-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding-top: 200px;
-  text-shadow: white 0 0 10px;
-}
-
-.container h2 {
-  font-size: 5rem;
+  justify-content: center;
+  color: white;
+  text-shadow: black 0 0 15px;
 }
 
 .container a {

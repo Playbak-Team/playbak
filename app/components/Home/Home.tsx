@@ -7,15 +7,19 @@ export default function Home(props: HomeProps): JSX.Element {
   const { name, quote } = props;
   return (
     <div className={styles.container} data-tid="container">
-      <Typography variant="h2" color="textPrimary">
-        Hello
-      </Typography>
-      <Typography variant="h2" color="textPrimary">
-        {name}
-      </Typography>
-      <Typography variant="h4" color="textPrimary">
-        {quote}
-      </Typography>
+      <div style={{ justifySelf: 'center', marginTop: 'auto' }}>
+        <Typography variant="h2" color="initial">
+          Hello
+        </Typography>
+        <Typography variant="h2" color="initial">
+          {name}
+        </Typography>
+      </div>
+      <div style={{ justifySelf: 'flex-end', marginTop: 'auto' }}>
+        <Typography variant="h4" color="initial">
+          {quote}
+        </Typography>
+      </div>
     </div>
   );
 }
