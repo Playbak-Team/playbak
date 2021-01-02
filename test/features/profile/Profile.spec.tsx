@@ -79,7 +79,6 @@ describe('Profile component', () => {
         </Provider>
       )
       .toJSON();
-
     expect(tree).toMatchSnapshot();
   });
 });
