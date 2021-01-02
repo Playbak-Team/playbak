@@ -5,6 +5,7 @@ import {
   Theme,
   createStyles,
 } from '@material-ui/core/styles';
+import HomeIcon from '@material-ui/icons/Home';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -135,6 +136,11 @@ export default function PrimarySearchAppBar() {
         className={classes.navbarStyle}
       >
         <Toolbar>
+          <Link to={routes.HOME}>
+            <IconButton aria-label="go to home" color="inherit">
+              <HomeIcon />
+            </IconButton>
+          </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <Link to={routes.KANBAN}>
