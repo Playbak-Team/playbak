@@ -1,7 +1,6 @@
 {
   "name": "playbak",
   "productName": "Playbak",
-  "version": "0.1.0",
   "description": "",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
