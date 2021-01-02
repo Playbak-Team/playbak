@@ -9,6 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -20,6 +21,8 @@ import {
   getSnackBarMessage,
   disableSnackbar,
   getSnackBarSeverity,
+  showError,
+  showSuccess,
 } from './videoSlice';
 import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
 import routes from '../../constants/routes.json';
@@ -119,6 +122,17 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
         <PlayCircleOutlineIcon />
       </IconButton>
       {video.name}
+      {!video.pbsPath && (
+        <IconButton
+          color="primary"
+          aria-label="No playbak speed data found. Click to run PBSGen."
+          onClick={() => {
+            ipcRenderer.send('generate-pbs', video.videoPath);
+          }}
+        >
+          <ErrorOutlineIcon />
+        </IconButton>
+      )}
     </div>
   );
 }
@@ -155,19 +169,39 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 }
 
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
+  const dispatch = useDispatch();
+
   const { course } = props;
 
   const wkspace = useSelector(getCurrentTerm);
   const [files, setFiles] = useState<VideoData[]>([]);
 
   useEffect(() => {
-    ipcRenderer.on('return-videos', (_event, videos) => {
-      setFiles(videos);
+    ipcRenderer.on('return-videos', (_event, targetCourse, videos) => {
+      if (targetCourse === course) {
+        setFiles(videos);
+      }
+    });
+    ipcRenderer.on('return-pbsgen', (_event, filename, pbsPath) => {
+      if (pbsPath) {
+        const videoIndex = files.findIndex((vid) => vid.videoPath === filename);
+        if (videoIndex >= 0) {
+          const newFiles = [...files];
+          const newVideoData = { ...newFiles[videoIndex] };
+          newVideoData.pbsPath = pbsPath;
+          dispatch(showSuccess('Playback speed data generated successfully!'));
+          newFiles[videoIndex] = newVideoData;
+          setFiles(newFiles);
+        }
+      } else {
+        dispatch(showError('Failed to generated playback speed data.'));
+      }
     });
     return () => {
       ipcRenderer.removeAllListeners('return-videos');
+      ipcRenderer.removeAllListeners('return-pbsgen');
     };
-  }, []);
+  }, [files, course]);
 
   useEffect(() => {
     ipcRenderer.send('get-videos', wkspace, course);

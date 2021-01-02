@@ -39,36 +39,6 @@ ipcMain.on('get-courses', async (event, wkspace: string) => {
   );
 });
 
-ipcMain.on('create-new-workspace', async (event, name: string) => {
-  if (!fs.existsSync(folders.workspaceRootDir)) {
-    await fs.mkdir(
-      folders.workspaceRootDir,
-      (err: Error | null, _data: any) => {
-        if (err) throw err;
-      }
-    );
-  }
-
-  if (!fs.existsSync(folders.getWorkspaceSettingFile(name))) {
-    fs.writeFileSync(
-      folders.getWorkspaceSettingFile(name),
-      JSON.stringify({
-        courses: [],
-      })
-    );
-  }
-
-  if (!fs.existsSync(folders.getWorkspaceDir(name))) {
-    await fs.mkdir(
-      folders.getWorkspaceDir(name),
-      (err: Error | null, _data: any) => {
-        if (err) throw err;
-      }
-    );
-    event.reply('created-workspace', name);
-  }
-});
-
 ipcMain.on(
   'create-new-course',
   async (event, wkspace: string, coursename: string) => {
@@ -80,7 +50,7 @@ ipcMain.on(
         }
       );
       folders.courseSubDirs.forEach((subDir) => {
-        console.log(subDir(wkspace, coursename));
+        // console.log(subDir(wkspace, coursename));
         if (!fs.existsSync(subDir(wkspace, coursename)))
           fs.mkdir(subDir(wkspace, coursename), (err: Error | null) => {
             if (err) throw err;
@@ -115,37 +85,46 @@ ipcMain.on(
 ipcMain.on('get-videos', async (event, wkspace: string, course: string) => {
   const videoDir = folders.getCourseVideoDir(wkspace, course);
   if (fs.existsSync(videoDir) && fs.lstatSync(videoDir).isDirectory()) {
-    event.reply(
-      'return-videos',
-      fs
-        .readdirSync(videoDir, {
-          withFileTypes: true,
-        })
-        .filter(
-          (dirent: typeof fs.Dirent) =>
-            dirent.isFile() && path.extname(dirent.name) === '.mp4'
-        )
-        .map((dirent: typeof fs.Dirent) => {
-          const videoPath = `${videoDir}\\${dirent.name}`;
+    fs.readdir(
+      videoDir,
+      {
+        withFileTypes: true,
+      },
+      (err: Error, files: fs.Dirent[]) => {
+        if (err) {
+          throw err;
+        }
+        event.reply(
+          'return-videos',
+          course,
+          files
+            .filter(
+              (dirent: typeof fs.Dirent) =>
+                dirent.isFile() && path.extname(dirent.name) === '.mp4'
+            )
+            .map((dirent: typeof fs.Dirent) => {
+              const videoPath = `${videoDir}\\${dirent.name}`;
 
-          let pbsPath = `${videoDir}\\${path.basename(
-            dirent.name,
-            path.extname(dirent.name)
-          )}.pbs`;
-          if (!fs.existsSync(pbsPath)) {
-            pbsPath = '';
-          }
+              let pbsPath = `${videoDir}\\${path.basename(
+                dirent.name,
+                path.extname(dirent.name)
+              )}.pbs`;
+              if (!fs.existsSync(pbsPath)) {
+                pbsPath = '';
+              }
 
-          return {
-            name: dirent.name,
-            videoPath,
-            pbsPath,
-            watched: false,
-          };
-        })
+              return {
+                name: dirent.name,
+                videoPath,
+                pbsPath,
+                watched: false,
+              };
+            })
+        );
+      }
     );
   } else {
-    event.reply('return-videos', []);
+    event.reply('return-videos', course, []);
   }
 });
 

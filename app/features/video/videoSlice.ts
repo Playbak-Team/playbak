@@ -42,10 +42,26 @@ const videoSlice = createSlice({
       state.snackbarMessage = `Video set to ${action.payload.name}`;
       state.snackbarSeverity = 'success';
     },
+    showError: (state, action: PayloadAction<string>) => {
+      state.snackbarActive = true;
+      state.snackbarMessage = action.payload;
+      state.snackbarSeverity = 'error';
+    },
+    showSuccess: (state, action: PayloadAction<string>) => {
+      state.snackbarActive = true;
+      state.snackbarMessage = action.payload;
+      state.snackbarSeverity = 'success';
+    },
   },
 });
 
-export const { addToURLS, setVideo, disableSnackbar } = videoSlice.actions;
+export const {
+  addToURLS,
+  setVideo,
+  disableSnackbar,
+  showError,
+  showSuccess,
+} = videoSlice.actions;
 
 export default videoSlice.reducer;
 

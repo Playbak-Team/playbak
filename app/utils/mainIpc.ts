@@ -172,18 +172,19 @@ ipcMain.on('create-new-workspace', async (event, name: string) => {
       if (err) throw err;
     });
   }
-
-  if (!fs.existsSync(folders.getWorkspaceDir(name))) {
-    await fs.mkdir(folders.getWorkspaceDir(name), (err: Error | null) => {
-      if (err) throw err;
-    });
-
+  if (!fs.existsSync(folders.getWorkspaceSettingFile(name))) {
     fs.writeFileSync(
       folders.getWorkspaceSettingFile(name),
       JSON.stringify({
         courses: [],
       })
     );
+  }
+
+  if (!fs.existsSync(folders.getWorkspaceDir(name))) {
+    await fs.mkdir(folders.getWorkspaceDir(name), (err: Error | null) => {
+      if (err) throw err;
+    });
 
     // eslint-disable-next-line prefer-const
     const db = new sqlite3.Database(
@@ -201,7 +202,6 @@ ipcMain.on('create-new-workspace', async (event, name: string) => {
     });
 
     db.close();
-
-    event.reply('created-workspace', name);
   }
+  event.reply('created-workspace', name);
 });

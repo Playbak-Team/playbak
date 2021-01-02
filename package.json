@@ -1,7 +1,6 @@
 {
   "name": "playbak",
   "productName": "Playbak",
-  "version": "1.0.0",
   "description": "",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -241,6 +240,7 @@
     "react-collapsible": "^2.8.1",
     "react-dom": "^16.12.0",
     "react-hot-loader": "^4.12.21",
+    "react-indiana-drag-scroll": "^1.8.0",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
     "redux": "^4.0.5",
