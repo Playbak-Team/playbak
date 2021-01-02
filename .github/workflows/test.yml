@@ -39,24 +39,21 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v1
-        
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: yarn install
+        run: |
+          yarn install --frozen-lockfile --network-timeout 300000
+          
       - name: Download PBSGen
         run: curl -O -L https://github.com/Playbak-Team/pbsgen/releases/latest/download/pbsgen.zip && unzip pbsgen.zip -d resources/pbsgen
-      
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: resources/pbsgen
-
-      # - name: Install Node.js, NPM and Yarn
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: 14
-
-      # - name: yarn install
-      #   run: |
-      #     yarn install --frozen-lockfile --network-timeout 300000
-      # - name: Package
-      #   env:
-      #     GH_TOKEN: ${{ secrets.github_token }}
-      #   run: |
-      #     yarn package-ci
+          
+      - name: Package
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
+        run: |
+          yarn package-ci
