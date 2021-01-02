@@ -1,15 +1,41 @@
 name: Test
 
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
+  # test:
+  #   name: Lint and Test
+  #   runs-on: windows-latest
+  #   steps:
+  #     - name: Check out Git repository
+  #       uses: actions/checkout@v1
 
-    strategy:
-      matrix:
-        os: [windows-latest]
+  #     - name: Install Node.js, NPM and Yarn
+  #       uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 14
 
+  #     - name: yarn install
+  #       run: |
+  #         yarn install --frozen-lockfile --network-timeout 300000
+
+  #     - name: yarn test
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       run: |
+  #         yarn package-ci
+  #         yarn lint
+  #         yarn tsc
+  #         yarn test
+  #         yarn build-e2e
+  #     - name: yarn test-e2e
+  #       run: |
+  #         yarn test-e2e
+  build:
+    name: Build
+    if: startsWith(github.ref, 'refs/tags/')
+    # needs: test
+    runs-on: windows-latest
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v1
@@ -23,25 +49,15 @@ jobs:
         run: |
           yarn install --frozen-lockfile --network-timeout 300000
 
-      - name: yarn test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          yarn package-ci
-          yarn lint
-          yarn tsc
-          yarn test
-          yarn build-e2e
-
-      - if: matrix.os == 'ubuntu-latest'
-        run: |
-          Xvfb :99 &
-          disown -ar
-          echo "::set-env name=DISPLAY:::99"
-
-      # TODO: Testcafe e2e are broken because of:
-      # https://github.com/DevExpress/testcafe/issues/4512
-      # Tests are currently broken on linux and macos
-      - if: matrix.os == 'windows-latest'
-        run: |
-          yarn test-e2e
+      - name: Download PBSGen
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'Playbak-Team/pbsgen'
+          version: 'latest'
+          file: 'pbsgen.zip'
+          token: ${{ secrets.github_token }}
+      # - name: Package
+      #   env:
+      #     GH_TOKEN: ${{ secrets.github_token }}
+      #   run: |
+      #     yarn package-ci

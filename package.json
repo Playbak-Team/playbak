@@ -76,9 +76,9 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate",
-      "private": false
+      "owner": "Playbak-Team",
+      "repo": "playbak",
+      "private": true
     },
     "asarUnpack": [
       "../node_modules/@ffmpeg-installer"
