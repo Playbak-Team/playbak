@@ -37,19 +37,19 @@ const profileSlice = createSlice({
     },
     setCourses: (state, action: PayloadAction<string[]>) => {
       state.courses = action.payload;
-      ipcRenderer.send('save-settings', state);
+      ipcRenderer.send('save-settings', JSON.stringify(state));
     },
     addWorkspace: (state, action: PayloadAction<string>) => {
       state.availableWorkspaces.push(action.payload);
       ipcRenderer.send('create-new-workspace', action.payload);
-      ipcRenderer.send('save-settings', state);
+      ipcRenderer.send('save-settings', JSON.stringify(state));
     },
     setName: (state, action: PayloadAction<string>) => {
       state.name = action.payload;
-      ipcRenderer.send('save-settings', state);
+      ipcRenderer.send('save-settings', JSON.stringify(state));
     },
     saveSettings: (state) => {
-      ipcRenderer.send('save-settings', state);
+      ipcRenderer.send('save-settings', JSON.stringify(state));
     },
   },
 });

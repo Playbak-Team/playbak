@@ -99,7 +99,8 @@
     "testURL": "http://localhost/",
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
+      "\\.(css|less|sass|scss)$": "identity-obj-proxy",
+      "electron": "<rootDir>/internals/mocks/electronMock.js"
     },
     "moduleFileExtensions": [
       "js",
@@ -245,6 +246,7 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "regenerator-runtime": "^0.13.5",
+    "react-indiana-drag-scroll": "^1.8.0",
     "source-map-support": "^0.5.19"
   },
   "devEngines": {

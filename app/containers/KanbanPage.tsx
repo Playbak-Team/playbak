@@ -8,13 +8,35 @@ import Kanban from '../features/kanban/Kanban';
 import Navbar from '../components/Navbar/Navbar';
 import Loader from '../components/Loader/Loader';
 
+const EmptyPage = () => {
+  return (
+    <div>
+      <Navbar />
+      <div
+        style={{
+          minWidth: '100vw',
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'black',
+          color: 'white',
+          overflow: 'hidden',
+        }}
+      >
+        Please select a workspace before using this feature
+      </div>
+    </div>
+  );
+};
+
 export default function KanbanPage() {
   const [isLoading, setLoading] = useState(true);
   const workspace = useSelector(getCurrentTerm);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading && workspace !== '') {
       ipcRenderer.send('load-kanban', workspace);
     }
     ipcRenderer.on('kanban-data', (_event, res: [string[], string[]]) => {
@@ -30,7 +52,7 @@ export default function KanbanPage() {
   return (
     <div>
       {isLoading ? (
-        <Loader />
+        <div>{workspace !== '' ? <Loader /> : <EmptyPage />}</div>
       ) : (
         <div style={{ overflow: 'hidden' }}>
           <Navbar />

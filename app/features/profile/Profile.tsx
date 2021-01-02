@@ -16,6 +16,7 @@ import Collapse from '@material-ui/core/Collapse';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import CancelRoundedIcon from '@material-ui/icons/CancelRounded';
+import { ipcRenderer } from 'electron';
 import {
   getCurrentTerm,
   setName,
@@ -28,8 +29,6 @@ import {
   setCourses,
 } from './profileSlice';
 import { WorkspaceEntryProps, CourseEntryProps } from '../../types';
-
-const { ipcRenderer } = window.require('electron');
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -229,7 +228,8 @@ export default function Profile() {
                   />
                   <IconButton
                     style={{ fontSize: 60, color: 'green' }}
-                    aria-label="edit name"
+                    aria-label="edit name confirm"
+                    id="edit-name-confirm"
                     onClick={() => {
                       dispatch(setName(nameChange));
                       setEditingName(false);
@@ -239,30 +239,26 @@ export default function Profile() {
                   </IconButton>
                 </div>
               ) : (
-                <div>
-                  <h2>
-                    {name}
-                    <IconButton
-                      color="secondary"
-                      style={{ fontSize: 60 }}
-                      aria-label="edit name"
-                      onClick={() => setEditingName(true)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </h2>
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                  <h2 id="user-name">{name}</h2>
+                  <IconButton
+                    color="secondary"
+                    style={{ fontSize: 60 }}
+                    aria-label="edit name"
+                    id="edit-name"
+                    onClick={() => setEditingName(true)}
+                  >
+                    <EditIcon />
+                  </IconButton>
                 </div>
               )}
             </div>
             <div className={classes.termrow}>
-              Current Selected Term:
+              <div style={{ marginRight: '10px' }}>Current Selected Term:</div>
               {currentTerm === '' ? (
                 <div>&nbsp;NONE</div>
               ) : (
-                <div>
-                  &nbsp;
-                  {currentTerm}
-                </div>
+                <div id="current-term">{currentTerm}</div>
               )}
             </div>
             <div className={classes.workspacestitle}>
@@ -328,7 +324,7 @@ export default function Profile() {
               {currentTerm === '' ? (
                 <div>No workspace selected</div>
               ) : (
-                <div>{currentTerm}</div>
+                <div id="display-selected-term">{currentTerm}</div>
               )}
               <IconButton onClick={() => setAddCoursePrompt(!addCoursePrompt)}>
                 {addCoursePrompt ? (
