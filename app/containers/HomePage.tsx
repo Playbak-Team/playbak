@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Home from '../components/Home/Home';
-import Navbar from '../components/Navbar/Navbar';
 import Loader from '../components/Loader/Loader';
 import {
   getName,
@@ -70,7 +69,6 @@ export default function HomePage() {
         <Loader />
       ) : (
         <div>
-          <Navbar />
           <Home name={name} quote={quote} />
         </div>
       )}
