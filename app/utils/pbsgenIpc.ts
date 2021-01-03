@@ -8,12 +8,17 @@ const folders = require('./playbakFolders');
 
 ipcMain.on('generate-pbs', async (event, filename: string) => {
   exec(
-    `${folders.pbsgenPath} ${folders.ffmpegPath} ${filename}`,
+    `${folders.pbsgenPath} "${folders.ffmpegPath}" "${filename}"`,
     (error: Error, stdout: string, stderr: string) => {
       if (error || stderr) {
-        event.reply('return-pbsgen', filename, '');
+        event.reply(
+          'return-pbsgen',
+          false,
+          filename,
+          `${error.message}. stderr: ${stderr}`
+        );
       } else if (stdout) {
-        event.reply('return-pbsgen', filename, stdout);
+        event.reply('return-pbsgen', true, filename, stdout);
       }
     }
   );
