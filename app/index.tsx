@@ -12,7 +12,7 @@ const AppContainer = process.env.PLAIN_HMR ? Fragment : ReactHotAppContainer;
 document.addEventListener('DOMContentLoaded', () => {
   // eslint-disable-next-line no-new
   new Titlebar({
-    backgroundColor: Color.fromHex('#323639'),
+    backgroundColor: Color.fromHex('#1B1E2B'),
     menu: null,
     unfocusEffect: true,
     titleHorizontalAlignment: 'left',
