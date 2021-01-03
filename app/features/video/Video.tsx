@@ -265,20 +265,6 @@ export default function Video() {
   return (
     <div className={classes.root}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
-          {/* <Paper className={classes.paper}>
-            <Link to={routes.HOME}>
-              <div className={classes.previous}>&#8249;</div>
-            </Link>
-          </Paper> */}
-          <AppBar position="static">
-            <Toolbar>
-              <Link to={routes.HOME}>
-                <div className={classes.previous}>&#8249;</div>
-              </Link>
-            </Toolbar>
-          </AppBar>
-        </Grid>
         <Grid item xs={menuExpanded ? 3 : 1}>
           <Paper className={`${classes.paper} ${classes.selection}`}>
             {menuExpanded ? (

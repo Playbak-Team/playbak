@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Home from '../components/Home/Home';
-import Navbar from '../components/Navbar/Navbar';
 import Loader from '../components/Loader/Loader';
 import {
   getName,
@@ -52,16 +51,5 @@ export default function HomePage() {
     ipcRenderer.send('init');
   }, []);
 
-  return (
-    <div>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div>
-          <Navbar />
-          <Home name={name} />
-        </div>
-      )}
-    </div>
-  );
+  return <div>{isLoading ? <Loader /> : <Home name={name} />}</div>;
 }
