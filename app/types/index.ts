@@ -65,6 +65,15 @@ type EditEntryProps = {
   handleEntrySave: (index: number, newEntry: string) => void;
 };
 
+type NewWorkspaceDialogProps = {
+  isWkOpen: boolean;
+  handleWkClose: (value: string) => void;
+};
+
+type WorkspaceInterfaceProps = {
+  workspace: string;
+};
+
 export {
   CollapsibleProps,
   CollapsibleCardProps,
@@ -76,4 +85,6 @@ export {
   EntryCardProps,
   DragProps,
   EditEntryProps,
+  NewWorkspaceDialogProps,
+  WorkspaceInterfaceProps,
 };
