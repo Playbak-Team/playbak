@@ -198,9 +198,7 @@ export default function Profile() {
   const dispatch = useDispatch();
 
   function handleWkClose(value: string) {
-    if (value !== '') {
-      dispatch(addWorkspace(value));
-    }
+    if (value !== '') dispatch(addWorkspace(value));
     setIsWkOpen(false);
   }
 
