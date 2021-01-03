@@ -15,6 +15,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import TextField from '@material-ui/core/TextField';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import { ipcRenderer } from 'electron';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import Snackbar from '@material-ui/core/Snackbar';
 import NewWorkspaceDialog from './NewWorkspaceDialog';
 import WorkspaceInterface from './WorkspaceInterface';
 import {
@@ -26,7 +28,15 @@ import {
   setWorkspace,
   setCourses,
 } from './profileSlice';
-import { WorkspaceEntryProps, CourseEntryProps } from '../../types';
+import {
+  isSnackBarActive,
+  getSnackBarMessage,
+  getSnackBarSeverity,
+  disableSnackbar,
+  showSuccess,
+  showError,
+} from '../video/videoSlice';
+import { WorkspaceEntryProps } from '../../types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -104,27 +114,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: '#3f2f4f',
       boxShadow: '0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0)',
     },
-    workspacearea: {
-      margin: '2em 2em 2em 2em',
-      padding: '2em, 2em, 2em, 2em',
-      minHeight: '80vh',
-    },
-    workspaceareatitle: {
-      margin: '0.5em 0.5em 0.5em 0.5em',
-      padding: '2em, 2em, 2em, 2em',
-      fontSize: '3em',
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
     whitetext: {
-      color: 'white',
-    },
-    buttonstyle: {
-      marginBottom: '10px',
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
       color: 'white',
     },
   })
@@ -178,27 +168,40 @@ function WorkspaceEntry(props: WorkspaceEntryProps) {
   );
 }
 
-function CourseEntry(props: CourseEntryProps) {
-  const classes = useStyles();
-  const { name } = props;
-  return <div className={classes.workspaceentry}>{name}</div>;
+function Alert(props: AlertProps) {
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
+
+// function CourseEntry(props: CourseEntryProps) {
+//   const classes = useStyles();
+//   const { name } = props;
+//   return <div className={classes.workspaceentry}>{name}</div>;
+// }
 
 export default function Profile() {
   const [editingName, setEditingName] = useState(false);
-  const [addCoursePrompt, setAddCoursePrompt] = useState(false);
-  const [courseString, setCourseString] = useState('');
   const [isWkOpen, setIsWkOpen] = useState(false);
   const classes = useStyles();
   const name = useSelector(getName);
   const allWorkspaces = useSelector(getAllWorkspaces);
   const currentTerm = useSelector(getCurrentTerm);
+  const snackbar = useSelector(isSnackBarActive);
+  const snackbarMessage = useSelector(getSnackBarMessage);
+  const severity = useSelector(getSnackBarSeverity);
   const [nameChange, setNameChange] = useState('');
   // const wkspace = useSelector(getCurrentTerm);
   const dispatch = useDispatch();
 
   function handleWkClose(value: string) {
-    if (value !== '') dispatch(addWorkspace(value));
+    if (value !== '' && !allWorkspaces.includes(value)) {
+      dispatch(addWorkspace(value));
+      dispatch(
+        showSuccess(`The workspace ${value} has been successfully added`)
+      );
+    } else {
+      dispatch(showError(`The workspace ${value} already exists`));
+    }
     setIsWkOpen(false);
   }
 
@@ -293,6 +296,22 @@ export default function Profile() {
           <WorkspaceInterface workspace={currentTerm} />
         </Grid>
       </Grid>
+      <Snackbar
+        open={snackbar}
+        autoHideDuration={1000}
+        onClose={() => {
+          dispatch(disableSnackbar());
+        }}
+        key={`${snackbarMessage}-bar`}
+      >
+        <Alert
+          key={`${snackbarMessage}-alert`}
+          onClose={() => dispatch(disableSnackbar())}
+          severity={severity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
