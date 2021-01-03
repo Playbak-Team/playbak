@@ -182,26 +182,30 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
         setFiles(videos);
       }
     });
-    ipcRenderer.on('return-pbsgen', (_event, filename, pbsPath) => {
-      if (pbsPath) {
+
+    ipcRenderer.on('return-pbsgen', (_event, success, filename, result) => {
+      if (success && result) {
         const videoIndex = files.findIndex((vid) => vid.videoPath === filename);
         if (videoIndex >= 0) {
           const newFiles = [...files];
           const newVideoData = { ...newFiles[videoIndex] };
-          newVideoData.pbsPath = pbsPath;
+          newVideoData.pbsPath = result;
           dispatch(showSuccess('Playback speed data generated successfully!'));
           newFiles[videoIndex] = newVideoData;
           setFiles(newFiles);
         }
       } else {
-        dispatch(showError('Failed to generated playback speed data.'));
+        dispatch(
+          showError(`Failed to generated playback speed data. Error: ${result}`)
+        );
       }
     });
+
     return () => {
       ipcRenderer.removeAllListeners('return-videos');
       ipcRenderer.removeAllListeners('return-pbsgen');
     };
-  }, [files, course]);
+  }, [files, course, dispatch]);
 
   useEffect(() => {
     ipcRenderer.send('get-videos', wkspace, course);
