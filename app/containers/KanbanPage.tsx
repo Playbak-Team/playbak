@@ -5,27 +5,23 @@ import ScrollContainer from 'react-indiana-drag-scroll';
 import { getCurrentTerm } from '../features/profile/profileSlice';
 import { setColumns, setEntries } from '../features/kanban/kanbanSlice';
 import Kanban from '../features/kanban/Kanban';
-import Navbar from '../components/Navbar/Navbar';
 import Loader from '../components/Loader/Loader';
 
 const EmptyPage = () => {
   return (
-    <div>
-      <Navbar />
-      <div
-        style={{
-          minWidth: '100vw',
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'black',
-          color: 'white',
-          overflow: 'hidden',
-        }}
-      >
-        Please select a workspace before using this feature
-      </div>
+    <div
+      style={{
+        minWidth: '100vw',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'black',
+        color: 'white',
+        overflow: 'hidden',
+      }}
+    >
+      Please select a workspace before using this feature
     </div>
   );
 };
@@ -55,7 +51,6 @@ export default function KanbanPage() {
         <div>{workspace !== '' ? <Loader /> : <EmptyPage />}</div>
       ) : (
         <div style={{ overflow: 'hidden' }}>
-          <Navbar />
           <ScrollContainer
             className="scroll-container"
             horizontal

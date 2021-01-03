@@ -182,22 +182,27 @@ const createWindow = async () => {
     height: 728,
     minWidth: 1024,
     minHeight: 728,
+    frame: false,
     backgroundColor: '#202225',
     darkTheme: true,
     icon: getAssetPath('icon.png'),
-    webPreferences:
-      (process.env.NODE_ENV === 'development' ||
-        process.env.E2E_BUILD === 'true') &&
-      process.env.ERB_SECURE !== 'true'
-        ? {
-            nodeIntegration: true,
-            enableRemoteModule: true,
-          }
-        : {
-            preload: path.join(__dirname, 'dist/renderer.prod.js'),
-            nodeIntegration: true,
-            enableRemoteModule: true,
-          },
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+    },
+    // webPreferences:
+    //   (process.env.NODE_ENV === 'development' ||
+    //     process.env.E2E_BUILD === 'true') &&
+    //   process.env.ERB_SECURE !== 'true'
+    //     ? {
+    //         nodeIntegration: true,
+    //         enableRemoteModule: true,
+    //       }
+    //     : {
+    //         preload: path.join(__dirname, 'dist/renderer.prod.js'),
+    //         nodeIntegration: true,
+    //         enableRemoteModule: true,
+    //       },
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
