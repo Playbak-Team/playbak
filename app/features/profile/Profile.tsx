@@ -262,16 +262,20 @@ export default function Profile() {
               )}
             </div>
             <div className={classes.termrow}>
-              <div>Current Selected Term:</div>
-              {currentTerm === '' ? (
-                <div>&nbsp;NONE</div>
-              ) : (
-                <div id="current-term">{currentTerm}</div>
-              )}
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <div style={{ marginRight: '1vw' }}>Selected Term:</div>
+                {currentTerm === '' ? (
+                  <div>&nbsp;NONE</div>
+                ) : (
+                  <div id="current-term">{currentTerm}</div>
+                )}
+              </div>
               <Button
-                variant="outlined"
+                variant="contained"
+                size="small"
                 color="secondary"
                 onClick={() => setIsWkOpen(true)}
+                style={{ maxWidth: 'min-content' }}
               >
                 Add a new workspace
               </Button>

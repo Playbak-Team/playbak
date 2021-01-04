@@ -172,7 +172,8 @@ const WorkspaceInfo = (props: { title: string }) => {
       <div className={classes.title}>
         <h2 style={{ alignSelf: 'center', marginLeft: 'auto' }}>{title}</h2>
         <Button
-          variant="outlined"
+          variant="contained"
+          size="small"
           color="secondary"
           style={{
             alignSelf: 'flex-end',
