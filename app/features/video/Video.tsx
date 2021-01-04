@@ -10,10 +10,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
-import {
-  showError,
-  showSuccess,
-} from '../../components/Snackbar/snackBarSlice';
+import { showInfo } from '../../components/Snackbar/snackBarSlice';
 
 import styles from './Video.css';
 
@@ -107,7 +104,7 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
         color="primary"
         aria-label="Select"
         onClick={() => {
-          dispatch(showSuccess(`Video set to ${video.name}`));
+          dispatch(showInfo(`Playing ${video.name}`));
           setVideo(video);
         }}
       >
