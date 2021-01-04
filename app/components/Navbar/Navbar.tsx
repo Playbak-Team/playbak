@@ -5,6 +5,7 @@ import {
   Theme,
   createStyles,
 } from '@material-ui/core/styles';
+import HomeIcon from '@material-ui/icons/Home';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -114,10 +115,16 @@ export default function PrimarySearchAppBar() {
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
       id={menuId}
       keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
@@ -135,6 +142,11 @@ export default function PrimarySearchAppBar() {
         className={classes.navbarStyle}
       >
         <Toolbar>
+          <Link to={routes.HOME}>
+            <IconButton aria-label="go to home" color="inherit">
+              <HomeIcon />
+            </IconButton>
+          </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <Link to={routes.KANBAN}>
@@ -147,15 +159,19 @@ export default function PrimarySearchAppBar() {
                 <OndemandVideoIcon />
               </IconButton>
             </Link>
-            <IconButton aria-label="go to calendar" color="inherit">
+            <IconButton aria-label="go to calendar" color="inherit" disabled>
               <DateRangeIcon />
             </IconButton>
-            <IconButton aria-label="show 4 new mails" color="inherit">
+            <IconButton aria-label="show 4 new mails" color="inherit" disabled>
               <Badge badgeContent={0} color="secondary">
                 <MailIcon />
               </Badge>
             </IconButton>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
+            <IconButton
+              aria-label="show 17 new notifications"
+              color="inherit"
+              disabled
+            >
               <Badge badgeContent={0} color="secondary" variant="dot">
                 <NotificationsIcon />
               </Badge>

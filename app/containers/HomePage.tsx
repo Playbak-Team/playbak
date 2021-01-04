@@ -14,17 +14,27 @@ const { ipcRenderer } = window.require('electron');
 
 export default function HomePage() {
   const [isLoading, setLoading] = useState(true);
+  const [quote, setQuote] = useState('');
   const dispatch = useDispatch();
   const name = useSelector(getName);
   // const workspace = useSelector(getCurrentTerm);
 
+  async function getQuote() {
+    const url = 'https://api.quotable.io/random';
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.content;
+  }
+
   useEffect(() => {
-    ipcRenderer.on('return-courses', (_, courses: string[]) => {
+    ipcRenderer.on('return-courses', async (_, courses: string[]) => {
       dispatch(setCourses(Object.values(courses)));
+      const q = await getQuote();
+      setQuote(q);
       setLoading(false);
     });
 
-    ipcRenderer.on('return-settings', (_event, settings: Settings) => {
+    ipcRenderer.on('return-settings', async (_event, settings: Settings) => {
       dispatch(
         setProfile({
           name: settings.name,
@@ -38,6 +48,8 @@ export default function HomePage() {
       if (settings.LST !== '') {
         ipcRenderer.send('get-courses', settings.LST);
       } else {
+        const q = await getQuote();
+        setQuote(q);
         setLoading(false);
       }
     });
@@ -51,5 +63,15 @@ export default function HomePage() {
     ipcRenderer.send('init');
   }, []);
 
-  return <div>{isLoading ? <Loader /> : <Home name={name} />}</div>;
+  return (
+    <div>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <div>
+          <Home name={name} quote={quote} />
+        </div>
+      )}
+    </div>
+  );
 }

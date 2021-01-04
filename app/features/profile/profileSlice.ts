@@ -40,9 +40,11 @@ const profileSlice = createSlice({
       ipcRenderer.send('save-settings', JSON.stringify(state));
     },
     addWorkspace: (state, action: PayloadAction<string>) => {
-      state.availableWorkspaces.push(action.payload);
-      ipcRenderer.send('create-new-workspace', action.payload);
-      ipcRenderer.send('save-settings', JSON.stringify(state));
+      if (!state.availableWorkspaces.includes(action.payload)) {
+        state.availableWorkspaces.push(action.payload);
+        ipcRenderer.send('create-new-workspace', action.payload);
+        ipcRenderer.send('save-settings', JSON.stringify(state));
+      }
     },
     setName: (state, action: PayloadAction<string>) => {
       state.name = action.payload;

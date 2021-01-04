@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -10,8 +9,6 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import {
@@ -25,7 +22,6 @@ import {
   showSuccess,
 } from './videoSlice';
 import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
-import routes from '../../constants/routes.json';
 
 import styles from './Video.css';
 

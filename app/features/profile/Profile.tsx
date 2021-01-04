@@ -7,16 +7,18 @@ import {
 } from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import IconButton from '@material-ui/core/IconButton';
 import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from '@material-ui/icons/Edit';
 import TextField from '@material-ui/core/TextField';
-import Collapse from '@material-ui/core/Collapse';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-import CancelRoundedIcon from '@material-ui/icons/CancelRounded';
 import { ipcRenderer } from 'electron';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import Snackbar from '@material-ui/core/Snackbar';
+import NewWorkspaceDialog from './NewWorkspaceDialog';
+import WorkspaceInterface from './WorkspaceInterface';
 import {
   getCurrentTerm,
   setName,
@@ -24,11 +26,17 @@ import {
   getAllWorkspaces,
   addWorkspace,
   setWorkspace,
-  addCourse,
-  getCurrentCourses,
   setCourses,
 } from './profileSlice';
-import { WorkspaceEntryProps, CourseEntryProps } from '../../types';
+import {
+  isSnackBarActive,
+  getSnackBarMessage,
+  getSnackBarSeverity,
+  disableSnackbar,
+  showSuccess,
+  showError,
+} from '../video/videoSlice';
+import { WorkspaceEntryProps } from '../../types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,9 +51,12 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(2),
       textAlign: 'center',
       color: 'white',
-      minHeight: '90vh',
+      minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
+      background: '#06170e',
+      boxShadow:
+        '8px 0px 0px 0px #DCD0C0, 0px 8px 0px 0px #B1938B, -8px 0px 0px 0px #4E4E56, 0px 0px 0px 8px #DA635D, 5px 5px 15px 5px rgba(0,0,0,0)',
     },
     row: {
       display: 'flex',
@@ -54,15 +65,17 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     namerow: {
       display: 'flex',
-      flexDirection: 'row',
+      flexDirection: 'column',
       justifyContent: 'space-between',
       alignItems: 'center',
       borderBottom: '3px solid #7FC5DC',
+      paddingBottom: '10px',
     },
     termrow: {
       display: 'flex',
       flexDirection: 'row',
-      justifyContent: 'flex-start',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       marginTop: '3vh',
       borderBottom: '3px solid #7FC5DC',
       paddingBottom: '3vh',
@@ -74,7 +87,6 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: 'hidden',
       height: '100%',
       position: 'relative',
-      border: '2px solid #4888C8',
     },
     workspacesdiv: {
       position: 'absolute',
@@ -88,6 +100,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       flexDirection: 'row',
       marginTop: '2vh',
+      marginBottom: '2vh',
       alignItems: 'center',
       justifyContent: 'space-between',
     },
@@ -96,33 +109,12 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alginItems: 'center',
-      paddingTop: '1vh',
-      paddingBottom: '1vh',
-      paddingLeft: '1vw',
-      border: '1px solid #173679',
-      textAlign: 'center',
-    },
-    workspacearea: {
-      margin: '2em 2em 2em 2em',
-      padding: '2em, 2em, 2em, 2em',
-      minHeight: '80vh',
-    },
-    workspaceareatitle: {
-      margin: '0.5em 0.5em 0.5em 0.5em',
-      padding: '2em, 2em, 2em, 2em',
-      fontSize: '3em',
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+      margin: '15px',
+      padding: '10px',
+      backgroundColor: '#3f2f4f',
+      boxShadow: '0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0)',
     },
     whitetext: {
-      color: 'white',
-    },
-    buttonstyle: {
-      marginBottom: '10px',
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
       color: 'white',
     },
   })
@@ -163,9 +155,9 @@ function WorkspaceEntry(props: WorkspaceEntryProps) {
   const { name } = props;
   return (
     <div className={classes.workspaceentry}>
-      {name}
+      <p>{name}</p>
       <IconButton
-        style={{ color: 'blue' }}
+        style={{ color: 'yellow' }}
         onClick={() => {
           dispatch(setWorkspace(name));
         }}
@@ -176,26 +168,42 @@ function WorkspaceEntry(props: WorkspaceEntryProps) {
   );
 }
 
-function CourseEntry(props: CourseEntryProps) {
-  const classes = useStyles();
-  const { name } = props;
-  return <div className={classes.workspaceentry}>{name}</div>;
+function Alert(props: AlertProps) {
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
+
+// function CourseEntry(props: CourseEntryProps) {
+//   const classes = useStyles();
+//   const { name } = props;
+//   return <div className={classes.workspaceentry}>{name}</div>;
+// }
 
 export default function Profile() {
   const [editingName, setEditingName] = useState(false);
-  const [addToWorkspace, setAddToWorkspace] = useState(false);
-  const [addCoursePrompt, setAddCoursePrompt] = useState(false);
-  const [courseString, setCourseString] = useState('');
-  const [workspaceString, setWorkspaceString] = useState('');
+  const [isWkOpen, setIsWkOpen] = useState(false);
   const classes = useStyles();
   const name = useSelector(getName);
   const allWorkspaces = useSelector(getAllWorkspaces);
-  const allCourses = useSelector(getCurrentCourses);
   const currentTerm = useSelector(getCurrentTerm);
+  const snackbar = useSelector(isSnackBarActive);
+  const snackbarMessage = useSelector(getSnackBarMessage);
+  const severity = useSelector(getSnackBarSeverity);
   const [nameChange, setNameChange] = useState('');
   // const wkspace = useSelector(getCurrentTerm);
   const dispatch = useDispatch();
+
+  function handleWkClose(value: string) {
+    if (value !== '' && !allWorkspaces.includes(value)) {
+      dispatch(addWorkspace(value));
+      dispatch(
+        showSuccess(`The workspace ${value} has been successfully added`)
+      );
+    } else {
+      dispatch(showError(`The workspace ${value} already exists`));
+    }
+    setIsWkOpen(false);
+  }
 
   useEffect(() => {
     ipcRenderer.on('return-courses', (_, courses: string[]) => {
@@ -212,7 +220,7 @@ export default function Profile() {
         <Grid item xs={3}>
           <div className={classes.paper}>
             <div className={classes.namerow}>
-              <AccountBoxIcon style={{ fontSize: 100 }} />
+              <AccountBoxIcon style={{ fontSize: 150 }} />
               {editingName ? (
                 <div>
                   <CssTextField
@@ -254,59 +262,29 @@ export default function Profile() {
               )}
             </div>
             <div className={classes.termrow}>
-              <div style={{ marginRight: '10px' }}>Current Selected Term:</div>
-              {currentTerm === '' ? (
-                <div>&nbsp;NONE</div>
-              ) : (
-                <div id="current-term">{currentTerm}</div>
-              )}
-            </div>
-            <div className={classes.workspacestitle}>
-              Available Workspaces
-              <IconButton onClick={() => setAddToWorkspace(!addToWorkspace)}>
-                {addToWorkspace ? (
-                  <CancelRoundedIcon className={classes.buttonstyle} />
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <div style={{ marginRight: '1vw' }}>Selected Term:</div>
+                {currentTerm === '' ? (
+                  <div>&nbsp;NONE</div>
                 ) : (
-                  <AddCircleIcon className={classes.buttonstyle} />
+                  <div id="current-term">{currentTerm}</div>
                 )}
-              </IconButton>
-            </div>
-            <Collapse in={addToWorkspace}>
-              <div
-                style={{
-                  marginBottom: '10px',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <CssTextField
-                  id="outlined-basic"
-                  label="Enter workspace name"
-                  variant="outlined"
-                  style={{
-                    width: '100%',
-                  }}
-                  InputProps={{
-                    className: classes.whitetext,
-                  }}
-                  value={workspaceString}
-                  onChange={(e) => setWorkspaceString(e.target.value)}
-                />
-                <IconButton
-                  style={{
-                    fontSize: 100,
-                    color: 'green',
-                  }}
-                  aria-label="edit"
-                  onClick={() => {
-                    dispatch(addWorkspace(workspaceString));
-                  }}
-                >
-                  <CheckIcon />
-                </IconButton>
               </div>
-            </Collapse>
+              <Button
+                variant="contained"
+                size="small"
+                color="secondary"
+                onClick={() => setIsWkOpen(true)}
+                style={{ maxWidth: 'min-content' }}
+              >
+                Add a new workspace
+              </Button>
+            </div>
+            <NewWorkspaceDialog
+              isWkOpen={isWkOpen}
+              handleWkClose={handleWkClose}
+            />
+            <div className={classes.workspacestitle}>Available Workspaces</div>
             <div className={classes.workspacesdivparent}>
               <div className={classes.workspacesdiv}>
                 {allWorkspaces.map((n) => (
@@ -319,70 +297,25 @@ export default function Profile() {
           </div>
         </Grid>
         <Grid item xs={9}>
-          <div className={classes.workspacearea}>
-            <div className={classes.workspaceareatitle}>
-              {currentTerm === '' ? (
-                <div>No workspace selected</div>
-              ) : (
-                <div id="display-selected-term">{currentTerm}</div>
-              )}
-              <IconButton onClick={() => setAddCoursePrompt(!addCoursePrompt)}>
-                {addCoursePrompt ? (
-                  <CancelRoundedIcon className={classes.buttonstyle} />
-                ) : (
-                  <AddCircleIcon className={classes.buttonstyle} />
-                )}
-              </IconButton>
-            </div>
-            <Collapse in={addCoursePrompt}>
-              <div
-                style={{
-                  marginBottom: '10px',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <CssTextField
-                  id="outlined-basic"
-                  label="Enter path"
-                  variant="outlined"
-                  style={{
-                    width: '100%',
-                  }}
-                  InputProps={{
-                    className: classes.whitetext,
-                  }}
-                  value={courseString}
-                  onChange={(e) => setCourseString(e.target.value)}
-                />
-                <IconButton
-                  style={{
-                    fontSize: 100,
-                    color: 'green',
-                  }}
-                  aria-label="edit"
-                  onClick={() => {
-                    dispatch(addCourse(courseString));
-                    setAddCoursePrompt(false);
-                  }}
-                >
-                  <CheckIcon />
-                </IconButton>
-              </div>
-            </Collapse>
-            <div className={classes.workspacesdivparent}>
-              <div className={classes.workspacesdiv}>
-                {allCourses.map((n) => (
-                  <div key={n}>
-                    <CourseEntry key={n} name={n} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <WorkspaceInterface workspace={currentTerm} />
         </Grid>
       </Grid>
+      <Snackbar
+        open={snackbar}
+        autoHideDuration={1000}
+        onClose={() => {
+          dispatch(disableSnackbar());
+        }}
+        key={`${snackbarMessage}-bar`}
+      >
+        <Alert
+          key={`${snackbarMessage}-alert`}
+          onClose={() => dispatch(disableSnackbar())}
+          severity={severity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
