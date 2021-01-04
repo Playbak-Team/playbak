@@ -185,7 +185,7 @@ const WorkspaceInfo = (props: { title: string }) => {
               autoFocus
               margin="dense"
               id="name"
-              label="Workspace"
+              label="Course"
               fullWidth
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}

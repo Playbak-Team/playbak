@@ -15,7 +15,13 @@ export default function Home(props: HomeProps): JSX.Element {
           {name}
         </Typography>
       </div>
-      <div style={{ justifySelf: 'flex-end', marginTop: 'auto' }}>
+      <div
+        style={{
+          justifySelf: 'flex-end',
+          marginTop: 'auto',
+          marginBottom: '5vh',
+        }}
+      >
         <Typography variant="h4" color="initial">
           {quote}
         </Typography>
