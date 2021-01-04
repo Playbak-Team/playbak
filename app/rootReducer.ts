@@ -7,6 +7,8 @@ import videoReducer from './features/video/videoSlice';
 import profileReducer from './features/profile/profileSlice';
 // eslint-disable-next-line import/no-cycle
 import kanbanReducer from './features/kanban/kanbanSlice';
+// eslint-disable-next-line import/no-cycle
+import snackbarReducer from './components/Snackbar/snackBarSlice';
 
 export default function createRootReducer(history: History) {
   return combineReducers({
@@ -14,5 +16,6 @@ export default function createRootReducer(history: History) {
     video: videoReducer,
     profile: profileReducer,
     kanban: kanbanReducer,
+    snackbar: snackbarReducer,
   });
 }

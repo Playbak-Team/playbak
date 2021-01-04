@@ -6,6 +6,7 @@ import { History } from 'history';
 import { Store } from '../store';
 import Routes from '../Routes';
 import Navbar from '../components/Navbar/Navbar';
+import SnackBar from '../components/Snackbar/SnackBar';
 
 type Props = {
   store: Store;
@@ -17,6 +18,7 @@ const Root = ({ store, history }: Props) => (
     <ConnectedRouter history={history}>
       <Navbar />
       <Routes />
+      <SnackBar />
     </ConnectedRouter>
   </Provider>
 );

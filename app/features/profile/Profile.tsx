@@ -15,8 +15,6 @@ import EditIcon from '@material-ui/icons/Edit';
 import TextField from '@material-ui/core/TextField';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import { ipcRenderer } from 'electron';
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
-import Snackbar from '@material-ui/core/Snackbar';
 import NewWorkspaceDialog from './NewWorkspaceDialog';
 import WorkspaceInterface from './WorkspaceInterface';
 import {
@@ -29,13 +27,9 @@ import {
   setCourses,
 } from './profileSlice';
 import {
-  isSnackBarActive,
-  getSnackBarMessage,
-  getSnackBarSeverity,
-  disableSnackbar,
   showSuccess,
   showError,
-} from '../video/videoSlice';
+} from '../../components/Snackbar/snackBarSlice';
 import { WorkspaceEntryProps } from '../../types';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -168,11 +162,6 @@ function WorkspaceEntry(props: WorkspaceEntryProps) {
   );
 }
 
-function Alert(props: AlertProps) {
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
 // function CourseEntry(props: CourseEntryProps) {
 //   const classes = useStyles();
 //   const { name } = props;
@@ -186,9 +175,6 @@ export default function Profile() {
   const name = useSelector(getName);
   const allWorkspaces = useSelector(getAllWorkspaces);
   const currentTerm = useSelector(getCurrentTerm);
-  const snackbar = useSelector(isSnackBarActive);
-  const snackbarMessage = useSelector(getSnackBarMessage);
-  const severity = useSelector(getSnackBarSeverity);
   const [nameChange, setNameChange] = useState('');
   // const wkspace = useSelector(getCurrentTerm);
   const dispatch = useDispatch();
@@ -300,22 +286,6 @@ export default function Profile() {
           <WorkspaceInterface workspace={currentTerm} />
         </Grid>
       </Grid>
-      <Snackbar
-        open={snackbar}
-        autoHideDuration={1000}
-        onClose={() => {
-          dispatch(disableSnackbar());
-        }}
-        key={`${snackbarMessage}-bar`}
-      >
-        <Alert
-          key={`${snackbarMessage}-alert`}
-          onClose={() => dispatch(disableSnackbar())}
-          severity={severity}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

@@ -17,7 +17,10 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { WorkspaceInterfaceProps } from '../../types';
 import { getCurrentCourses, addCourse } from './profileSlice';
-import { showSuccess, showError } from '../video/videoSlice';
+import {
+  showSuccess,
+  showError,
+} from '../../components/Snackbar/snackBarSlice';
 
 interface TabPanelProps {
   // eslint-disable-next-line react/require-default-props

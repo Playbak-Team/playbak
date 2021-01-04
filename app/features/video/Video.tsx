@@ -9,19 +9,12 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import { getCurrentVideo, setVideo } from './videoSlice';
+import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
 import {
-  getCurrentVideo,
-  setVideo,
-  isSnackBarActive,
-  getSnackBarMessage,
-  disableSnackbar,
-  getSnackBarSeverity,
   showError,
   showSuccess,
-} from './videoSlice';
-import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
+} from '../../components/Snackbar/snackBarSlice';
 
 import styles from './Video.css';
 
@@ -31,6 +24,7 @@ import {
   VideoPlayerProps,
 } from '../../types';
 import { PBSData, VideoData, emptyPBSData } from '../../interfaces';
+// import { FaceRounded } from '@material-ui/icons';
 
 const { ipcRenderer } = require('electron');
 
@@ -98,11 +92,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function Alert(props: AlertProps) {
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
 function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -113,7 +102,10 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
       <IconButton
         color="primary"
         aria-label="Select"
-        onClick={() => dispatch(setVideo(video))}
+        onClick={() => {
+          dispatch(showSuccess(`Video set to ${video.name}`));
+          dispatch(setVideo(video));
+        }}
       >
         <PlayCircleOutlineIcon />
       </IconButton>
@@ -233,11 +225,8 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
 }
 
 export default function Video() {
-  const dispatch = useDispatch();
   const curVideo = useSelector(getCurrentVideo);
-  const snackbar = useSelector(isSnackBarActive);
-  const snackbarMessage = useSelector(getSnackBarMessage);
-  const severity = useSelector(getSnackBarSeverity);
+
   const classes = useStyles();
   const [menuExpanded, setMenuExpanded] = useState<boolean>(true);
   const [pbsData, setPBSData] = useState<PBSData>(emptyPBSData());
@@ -296,22 +285,6 @@ export default function Video() {
           </Paper>
         </Grid>
       </Grid>
-      <Snackbar
-        open={snackbar}
-        autoHideDuration={1000}
-        onClose={() => {
-          dispatch(disableSnackbar());
-        }}
-        key={`${snackbarMessage}-bar`}
-      >
-        <Alert
-          key={`${snackbarMessage}-alert`}
-          onClose={() => dispatch(disableSnackbar())}
-          severity={severity}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

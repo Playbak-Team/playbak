@@ -8,72 +8,39 @@ import {
 } from '../../interfaces';
 
 const initialState: VideoStateInterface = {
-  videoURLS: [],
+  // videoURLS: [],
   currentVideo: emptyVideoData(),
-  snackbarActive: false,
-  snackbarMessage: '',
-  snackbarSeverity: undefined,
 };
 
 const videoSlice = createSlice({
   name: 'video',
   initialState,
   reducers: {
-    disableSnackbar: (state) => {
-      state.snackbarActive = false;
-    },
-    addToURLS: (state, action: PayloadAction<string>) => {
-      if (!state.videoURLS.includes(action.payload) && action.payload !== '') {
-        state.videoURLS.push(action.payload);
-        state.snackbarMessage = `Added ${action.payload} to paths`;
-        state.snackbarSeverity = 'success';
-      } else if (state.videoURLS.includes(action.payload)) {
-        state.snackbarMessage = 'Path already exists';
-        state.snackbarSeverity = 'error';
-      } else if (action.payload === '') {
-        state.snackbarMessage = 'Cannot add an empty path';
-        state.snackbarSeverity = 'error';
-      }
-      state.snackbarActive = true;
-    },
+    // addToURLS: (state, action: PayloadAction<string>) => {
+    //   if (!state.videoURLS.includes(action.payload) && action.payload !== '') {
+    //     state.videoURLS.push(action.payload);
+    //     state.snackbarMessage = `Added ${action.payload} to paths`;
+    //     state.snackbarSeverity = 'success';
+    //   } else if (state.videoURLS.includes(action.payload)) {
+    //     state.snackbarMessage = 'Path already exists';
+    //     state.snackbarSeverity = 'error';
+    //   } else if (action.payload === '') {
+    //     state.snackbarMessage = 'Cannot add an empty path';
+    //     state.snackbarSeverity = 'error';
+    //   }
+    //   state.snackbarActive = true;
+    // },
     setVideo: (state, action: PayloadAction<VideoData>) => {
       state.currentVideo = action.payload;
-      state.snackbarActive = true;
-      state.snackbarMessage = `Video set to ${action.payload.name}`;
-      state.snackbarSeverity = 'success';
-    },
-    showError: (state, action: PayloadAction<string>) => {
-      state.snackbarActive = true;
-      state.snackbarMessage = action.payload;
-      state.snackbarSeverity = 'error';
-    },
-    showSuccess: (state, action: PayloadAction<string>) => {
-      state.snackbarActive = true;
-      state.snackbarMessage = action.payload;
-      state.snackbarSeverity = 'success';
+      // state.snackbarActive = true;
+      // state.snackbarMessage = `Video set to ${action.payload.name}`;
+      // state.snackbarSeverity = 'success';
     },
   },
 });
 
-export const {
-  addToURLS,
-  setVideo,
-  disableSnackbar,
-  showError,
-  showSuccess,
-} = videoSlice.actions;
+export const { setVideo } = videoSlice.actions;
 
 export default videoSlice.reducer;
 
-export const getPathURLS = (state: RootState) => state.video.videoURLS;
-
 export const getCurrentVideo = (state: RootState) => state.video.currentVideo;
-
-export const isSnackBarActive = (state: RootState) =>
-  state.video.snackbarActive;
-
-export const getSnackBarMessage = (state: RootState) =>
-  state.video.snackbarMessage;
-
-export const getSnackBarSeverity = (state: RootState) =>
-  state.video.snackbarSeverity;
