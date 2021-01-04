@@ -40,10 +40,6 @@ const emptyPBSData = (): PBSData => ({
   speeds: [],
 });
 
-interface VideoStateInterface {
-  currentVideo: VideoData;
-}
-
 interface ProfileStateInterface {
   name: string;
   selectedWorkspace: string;
@@ -79,7 +75,6 @@ interface SnackbarStateInterface {
 
 // eslint-disable-next-line import/prefer-default-export
 export {
-  VideoStateInterface,
   ProfileStateInterface,
   KanbanStateInterface,
   VideoData,

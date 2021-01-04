@@ -9,7 +9,6 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import { getCurrentVideo, setVideo } from './videoSlice';
 import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
 import {
   showError,
@@ -23,7 +22,12 @@ import {
   CollapsibleCardProps,
   VideoPlayerProps,
 } from '../../types';
-import { PBSData, VideoData, emptyPBSData } from '../../interfaces';
+import {
+  PBSData,
+  VideoData,
+  emptyPBSData,
+  emptyVideoData,
+} from '../../interfaces';
 // import { FaceRounded } from '@material-ui/icons';
 
 const { ipcRenderer } = require('electron');
@@ -95,7 +99,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { video } = props;
+  const { video, setVideo } = props;
 
   return (
     <div className={classes.videobutton}>
@@ -104,7 +108,7 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
         aria-label="Select"
         onClick={() => {
           dispatch(showSuccess(`Video set to ${video.name}`));
-          dispatch(setVideo(video));
+          setVideo(video);
         }}
       >
         <PlayCircleOutlineIcon />
@@ -159,7 +163,7 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
   const dispatch = useDispatch();
 
-  const { course } = props;
+  const { course, setVideo } = props;
 
   const wkspace = useSelector(getCurrentTerm);
   const [files, setFiles] = useState<VideoData[]>([]);
@@ -216,7 +220,11 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
       <div className={styles.collapsiblecontent}>
         <div className={styles.contentinner}>
           {files.map((file) => (
-            <CollapsibleCard video={file} key={Math.random()} />
+            <CollapsibleCard
+              video={file}
+              key={Math.random()}
+              setVideo={setVideo}
+            />
           ))}
         </div>
       </div>
@@ -225,11 +233,10 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
 }
 
 export default function Video() {
-  const curVideo = useSelector(getCurrentVideo);
-
   const classes = useStyles();
   const [menuExpanded, setMenuExpanded] = useState<boolean>(true);
   const [pbsData, setPBSData] = useState<PBSData>(emptyPBSData());
+  const [curVideo, setVideo] = useState<VideoData>(emptyVideoData());
 
   const currentCourses = useSelector(getCurrentCourses);
 
@@ -264,7 +271,7 @@ export default function Video() {
                   </IconButton>
                 </div>
                 {currentCourses.map((dir: string) => (
-                  <MyCollapsible key={dir} course={dir} />
+                  <MyCollapsible key={dir} course={dir} setVideo={setVideo} />
                 ))}
               </div>
             ) : (
