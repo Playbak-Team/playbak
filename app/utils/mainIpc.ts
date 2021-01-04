@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { ProfileStateInterface, emptySettings } from '../interfaces';
+import { SnackbarSeverity, emptySettings } from '../interfaces';
 import { getColumns, getEvents, mapEntries } from './mainPromises';
 
 const fs = require('fs');
@@ -8,11 +8,18 @@ const folders = require('./playbakFolders');
 
 let globalWorkspace = '';
 
-ipcMain.on('save-columns', async (_event, columns: string[]) => {
+ipcMain.on('save-columns', async (event, columns: string[]) => {
   const db = await new sqlite3.Database(
     folders.getWorkspaceKanbandb(globalWorkspace),
     (err: Error | null) => {
-      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to get courses: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw folders.getWorkspaceKanbandb(globalWorkspace);
+      }
     }
   );
 
@@ -28,11 +35,18 @@ ipcMain.on('save-columns', async (_event, columns: string[]) => {
   db.close();
 });
 
-ipcMain.on('remove-columns', async (_event, column: string) => {
+ipcMain.on('remove-columns', async (event, column: string) => {
   const db = await new sqlite3.Database(
     folders.getWorkspaceKanbandb(globalWorkspace),
     (err: Error | null) => {
-      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to remove columns: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw folders.getWorkspaceKanbandb(globalWorkspace);
+      }
     }
   );
   await db.serialize(async () => {
@@ -41,11 +55,18 @@ ipcMain.on('remove-columns', async (_event, column: string) => {
   db.close();
 });
 
-ipcMain.on('add-entry', async (_event, entry: string) => {
+ipcMain.on('add-entry', async (event, entry: string) => {
   const db = await new sqlite3.Database(
     folders.getWorkspaceKanbandb(globalWorkspace),
     (err: Error | null) => {
-      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to add entry: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw folders.getWorkspaceKanbandb(globalWorkspace);
+      }
     }
   );
   await db.serialize(async () => {
@@ -57,13 +78,20 @@ ipcMain.on('add-entry', async (_event, entry: string) => {
   db.close();
 });
 
-ipcMain.on('save-entries', async (_event, entries: string[]) => {
+ipcMain.on('save-entries', async (event, entries: string[]) => {
   const mapped = await mapEntries(entries);
 
   const db = await new sqlite3.Database(
     folders.getWorkspaceKanbandb(globalWorkspace),
     (err: Error | null) => {
-      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to save entries: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw folders.getWorkspaceKanbandb(globalWorkspace);
+      }
     }
   );
 
@@ -78,11 +106,18 @@ ipcMain.on('save-entries', async (_event, entries: string[]) => {
   await db.close();
 });
 
-ipcMain.on('delete-entry', async (_event, entry: string) => {
+ipcMain.on('delete-entry', async (event, entry: string) => {
   const db = await new sqlite3.Database(
     folders.getWorkspaceKanbandb(globalWorkspace),
     (err: Error | null) => {
-      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to delete entry: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw folders.getWorkspaceKanbandb(globalWorkspace);
+      }
     }
   );
   db.serialize(async () => {
@@ -96,7 +131,14 @@ ipcMain.on('replace-entry', async (event, entry: string) => {
   const db = await new sqlite3.Database(
     folders.getWorkspaceKanbandb(globalWorkspace),
     (err: Error | null) => {
-      if (err) throw folders.getWorkspaceKanbandb(globalWorkspace);
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to replace entry: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw folders.getWorkspaceKanbandb(globalWorkspace);
+      }
     }
   );
   const v = entry.split(',');
@@ -116,7 +158,14 @@ ipcMain.on('load-kanban', async (event, workspace: string) => {
   const db = await new sqlite3.Database(
     folders.getWorkspaceKanbandb(workspace),
     (err: Error | null) => {
-      if (err) throw folders.getWorkspaceKanbandb(workspace);
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to load kanban: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw folders.getWorkspaceKanbandb(globalWorkspace);
+      }
     }
   );
 
@@ -156,7 +205,14 @@ ipcMain.on('init', async (event) => {
     fs.writeFileSync(folders.settingFile, JSON.stringify(emptySettings()));
   }
   fs.readFile(folders.settingFile, async (err: Error | null, data: string) => {
-    if (err) throw err;
+    if (err) {
+      event.reply(
+        'show-snackbar',
+        `Failed to read settings file: ${err}`,
+        SnackbarSeverity.error
+      );
+      throw err;
+    }
 
     const settings = JSON.parse(data);
 
@@ -169,7 +225,14 @@ ipcMain.on('init', async (event) => {
 ipcMain.on('create-new-workspace', async (event, name: string) => {
   if (!fs.existsSync(folders.workspaceRootDir)) {
     await fs.mkdir(folders.workspaceRootDir, (err: Error | null) => {
-      if (err) throw err;
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to make workspace root dir: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw err;
+      }
     });
   }
   if (!fs.existsSync(folders.getWorkspaceSettingFile(name))) {
@@ -183,14 +246,28 @@ ipcMain.on('create-new-workspace', async (event, name: string) => {
 
   if (!fs.existsSync(folders.getWorkspaceDir(name))) {
     await fs.mkdir(folders.getWorkspaceDir(name), (err: Error | null) => {
-      if (err) throw err;
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to make workspace dir: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw err;
+      }
     });
 
     // eslint-disable-next-line prefer-const
     const db = new sqlite3.Database(
       folders.getWorkspaceKanbandb(name),
       (err: Error | null) => {
-        if (err) throw err;
+        if (err) {
+          event.reply(
+            'show-snackbar',
+            `Failed to create new database: ${err}`,
+            SnackbarSeverity.error
+          );
+          throw err;
+        }
       }
     );
 

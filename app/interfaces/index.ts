@@ -67,6 +67,13 @@ interface Events {
   belongsto: string;
 }
 
+enum SnackbarSeverity {
+  success = 'success',
+  info = 'info',
+  warning = 'warning',
+  error = 'error',
+}
+
 interface SnackbarStateInterface {
   snackbarActive: boolean;
   snackbarMessage: string;
@@ -85,5 +92,6 @@ export {
   Events,
   PBSData,
   emptyPBSData,
+  SnackbarSeverity,
   SnackbarStateInterface,
 };
