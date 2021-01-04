@@ -9,19 +9,8 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
-import {
-  getCurrentVideo,
-  setVideo,
-  isSnackBarActive,
-  getSnackBarMessage,
-  disableSnackbar,
-  getSnackBarSeverity,
-  showError,
-  showSuccess,
-} from './videoSlice';
 import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
+import { showInfo } from '../../components/Snackbar/snackBarSlice';
 
 import styles from './Video.css';
 
@@ -30,7 +19,13 @@ import {
   CollapsibleCardProps,
   VideoPlayerProps,
 } from '../../types';
-import { PBSData, VideoData, emptyPBSData } from '../../interfaces';
+import {
+  PBSData,
+  VideoData,
+  emptyPBSData,
+  emptyVideoData,
+} from '../../interfaces';
+// import { FaceRounded } from '@material-ui/icons';
 
 const { ipcRenderer } = require('electron');
 
@@ -98,22 +93,20 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function Alert(props: AlertProps) {
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
 function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { video } = props;
+  const { video, setVideo } = props;
 
   return (
     <div className={classes.videobutton}>
       <IconButton
         color="primary"
         aria-label="Select"
-        onClick={() => dispatch(setVideo(video))}
+        onClick={() => {
+          dispatch(showInfo(`Playing ${video.name}`));
+          setVideo(video);
+        }}
       >
         <PlayCircleOutlineIcon />
       </IconButton>
@@ -167,7 +160,7 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
   const dispatch = useDispatch();
 
-  const { course } = props;
+  const { course, setVideo } = props;
 
   const wkspace = useSelector(getCurrentTerm);
   const [files, setFiles] = useState<VideoData[]>([]);
@@ -179,21 +172,16 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
       }
     });
 
-    ipcRenderer.on('return-pbsgen', (_event, success, filename, result) => {
-      if (success && result) {
+    ipcRenderer.on('return-pbsgen', (_event, filename, result) => {
+      if (result) {
         const videoIndex = files.findIndex((vid) => vid.videoPath === filename);
         if (videoIndex >= 0) {
           const newFiles = [...files];
           const newVideoData = { ...newFiles[videoIndex] };
           newVideoData.pbsPath = result;
-          dispatch(showSuccess('Playback speed data generated successfully!'));
           newFiles[videoIndex] = newVideoData;
           setFiles(newFiles);
         }
-      } else {
-        dispatch(
-          showError(`Failed to generated playback speed data. Error: ${result}`)
-        );
       }
     });
 
@@ -224,7 +212,11 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
       <div className={styles.collapsiblecontent}>
         <div className={styles.contentinner}>
           {files.map((file) => (
-            <CollapsibleCard video={file} key={Math.random()} />
+            <CollapsibleCard
+              video={file}
+              key={Math.random()}
+              setVideo={setVideo}
+            />
           ))}
         </div>
       </div>
@@ -233,14 +225,10 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
 }
 
 export default function Video() {
-  const dispatch = useDispatch();
-  const curVideo = useSelector(getCurrentVideo);
-  const snackbar = useSelector(isSnackBarActive);
-  const snackbarMessage = useSelector(getSnackBarMessage);
-  const severity = useSelector(getSnackBarSeverity);
   const classes = useStyles();
   const [menuExpanded, setMenuExpanded] = useState<boolean>(true);
   const [pbsData, setPBSData] = useState<PBSData>(emptyPBSData());
+  const [curVideo, setVideo] = useState<VideoData>(emptyVideoData());
 
   const currentCourses = useSelector(getCurrentCourses);
 
@@ -275,7 +263,7 @@ export default function Video() {
                   </IconButton>
                 </div>
                 {currentCourses.map((dir: string) => (
-                  <MyCollapsible key={dir} course={dir} />
+                  <MyCollapsible key={dir} course={dir} setVideo={setVideo} />
                 ))}
               </div>
             ) : (
@@ -296,22 +284,6 @@ export default function Video() {
           </Paper>
         </Grid>
       </Grid>
-      <Snackbar
-        open={snackbar}
-        autoHideDuration={1000}
-        onClose={() => {
-          dispatch(disableSnackbar());
-        }}
-        key={`${snackbarMessage}-bar`}
-      >
-        <Alert
-          key={`${snackbarMessage}-alert`}
-          onClose={() => dispatch(disableSnackbar())}
-          severity={severity}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

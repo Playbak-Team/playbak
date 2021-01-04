@@ -19,6 +19,7 @@ import installExtension, {
   REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer';
 import MenuBuilder from './menu';
+import { SnackbarSeverity } from './interfaces';
 
 const fs = require('fs');
 const folders = require('./utils/playbakFolders');
@@ -30,7 +31,14 @@ ipcMain.on('get-courses', async (event, wkspace: string) => {
   fs.readFile(
     folders.getWorkspaceSettingFile(wkspace),
     async (err: Error | null, data: string) => {
-      if (err) throw err;
+      if (err) {
+        event.reply(
+          'show-snackbar',
+          `Failed to get courses: ${err}`,
+          SnackbarSeverity.error
+        );
+        throw err;
+      }
 
       const settings = JSON.parse(data);
 
@@ -46,21 +54,42 @@ ipcMain.on(
       fs.mkdir(
         folders.getCourseRootDir(wkspace, coursename),
         (err: Error | null) => {
-          if (err) throw err;
+          if (err) {
+            event.reply(
+              'show-snackbar',
+              `Failed to create course root dir: ${err}`,
+              SnackbarSeverity.error
+            );
+            throw err;
+          }
         }
       );
       folders.courseSubDirs.forEach((subDir) => {
         // console.log(subDir(wkspace, coursename));
         if (!fs.existsSync(subDir(wkspace, coursename)))
           fs.mkdir(subDir(wkspace, coursename), (err: Error | null) => {
-            if (err) throw err;
+            if (err) {
+              event.reply(
+                'show-snackbar',
+                `Failed to create course sub dir: ${err}`,
+                SnackbarSeverity.error
+              );
+              throw err;
+            }
           });
       });
 
       fs.readFile(
         folders.getWorkspaceSettingFile(wkspace),
         async (err: Error | null, data: string) => {
-          if (err) throw err;
+          if (err) {
+            event.reply(
+              'show-snackbar',
+              `Failed to read Workspace Settings File: ${err}`,
+              SnackbarSeverity.error
+            );
+            throw err;
+          }
 
           const settings = JSON.parse(data);
 
@@ -92,6 +121,11 @@ ipcMain.on('get-videos', async (event, wkspace: string, course: string) => {
       },
       (err: Error, files: fs.Dirent[]) => {
         if (err) {
+          event.reply(
+            'show-snackbar',
+            `Failed to read video dir: ${err}`,
+            SnackbarSeverity.error
+          );
           throw err;
         }
         event.reply(

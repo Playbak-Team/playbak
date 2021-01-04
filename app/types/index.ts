@@ -3,10 +3,12 @@ import { PBSData, VideoData } from '../interfaces';
 
 type CollapsibleProps = {
   course: string;
+  setVideo: React.Dispatch<React.SetStateAction<VideoData>>;
 };
 
 type CollapsibleCardProps = {
   video: VideoData;
+  setVideo: React.Dispatch<React.SetStateAction<VideoData>>;
 };
 
 type VideoPlayerProps = {

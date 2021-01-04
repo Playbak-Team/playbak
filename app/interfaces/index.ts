@@ -40,14 +40,6 @@ const emptyPBSData = (): PBSData => ({
   speeds: [],
 });
 
-interface VideoStateInterface {
-  videoURLS: string[];
-  currentVideo: VideoData;
-  snackbarActive: boolean;
-  snackbarMessage: string;
-  snackbarSeverity: 'success' | 'info' | 'warning' | 'error' | undefined;
-}
-
 interface ProfileStateInterface {
   name: string;
   selectedWorkspace: string;
@@ -75,9 +67,21 @@ interface Events {
   belongsto: string;
 }
 
+enum SnackbarSeverity {
+  success = 'success',
+  info = 'info',
+  warning = 'warning',
+  error = 'error',
+}
+
+interface SnackbarStateInterface {
+  snackbarActive: boolean;
+  snackbarMessage: string;
+  snackbarSeverity: 'success' | 'info' | 'warning' | 'error' | undefined;
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export {
-  VideoStateInterface,
   ProfileStateInterface,
   KanbanStateInterface,
   VideoData,
@@ -88,4 +92,6 @@ export {
   Events,
   PBSData,
   emptyPBSData,
+  SnackbarSeverity,
+  SnackbarStateInterface,
 };

@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { emptyPBSData } from '../interfaces';
+import { emptyPBSData, SnackbarSeverity } from '../interfaces';
 
 const fs = require('fs');
 const readline = require('readline');
@@ -12,13 +12,18 @@ ipcMain.on('generate-pbs', async (event, filename: string) => {
     (error: Error, stdout: string, stderr: string) => {
       if (error || stderr) {
         event.reply(
-          'return-pbsgen',
-          false,
-          filename,
-          `${error.message}. stderr: ${stderr}`
+          'show-snackbar',
+          `Failed to generated playback speed data. Error: ${error} stderr: ${stderr}`,
+          SnackbarSeverity.error
         );
+        event.reply('return-pbsgen', filename, '');
       } else if (stdout) {
-        event.reply('return-pbsgen', true, filename, stdout);
+        event.reply(
+          'show-snackbar',
+          'Playback speed data generated successfully!',
+          SnackbarSeverity.success
+        );
+        event.reply('return-pbsgen', filename, stdout);
       }
     }
   );
