@@ -59,7 +59,12 @@ const StyledTabs = withStyles({
     },
   },
 })((props: StyledTabsProps) => (
-  <Tabs {...props} TabIndicatorProps={{ children: <span /> }} />
+  <Tabs
+    {...props}
+    variant="scrollable"
+    scrollButtons="auto"
+    TabIndicatorProps={{ children: <span /> }}
+  />
 ));
 
 interface StyledTabProps {
