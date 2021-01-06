@@ -259,13 +259,23 @@ export default function Video() {
         <h1 style={{ color: 'black', fontFamily: 'Redressed, cursive' }}>
           NOW WATCHING
         </h1>
-        <div style={{ marginLeft: '20px', marginRight: '20px' }}>
+        <div
+          style={{
+            marginLeft: '20px',
+          }}
+        >
           {curVideo.name !== '' ? curVideo.name : 'Nothing..'}
         </div>
         <Button
           variant="contained"
           color="primary"
           onClick={() => setMenuExpanded(true)}
+          style={{
+            alignSelf: 'flex-end',
+            marginLeft: 'auto',
+            marginBottom: '20px',
+            marginRight: '30px',
+          }}
         >
           Select a video
         </Button>
