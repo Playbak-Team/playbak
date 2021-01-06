@@ -261,7 +261,7 @@ export default function Profile() {
                 size="small"
                 color="secondary"
                 onClick={() => setIsWkOpen(true)}
-                style={{ maxWidth: 'min-content' }}
+                style={{ maxWidth: 'max-content' }}
               >
                 Add a new workspace
               </Button>
