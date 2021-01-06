@@ -112,6 +112,8 @@ function CourseCard(props: CollapsibleCardProps): JSX.Element {
   const dispatch = useDispatch();
   const { video, setVideo } = props;
 
+  console.log(video);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <ListItemIcon
@@ -204,7 +206,7 @@ function DrawerList(props: CollapsibleProps): JSX.Element {
       ipcRenderer.removeAllListeners('return-videos');
       ipcRenderer.removeAllListeners('return-pbsgen');
     };
-  }, [files, course, dispatch]);
+  }, []);
 
   useEffect(() => {
     ipcRenderer.send('get-videos', wkspace, course);
@@ -231,7 +233,7 @@ function DrawerList(props: CollapsibleProps): JSX.Element {
 
 export default function Video() {
   const classes = useStyles();
-  const [menuExpanded, setMenuExpanded] = useState<boolean>(true);
+  const [menuExpanded, setMenuExpanded] = useState<boolean>(false);
   const [pbsData, setPBSData] = useState<PBSData>(emptyPBSData());
   const [curVideo, setVideo] = useState<VideoData>(emptyVideoData());
 
@@ -254,11 +256,17 @@ export default function Video() {
   return (
     <div className={classes.root}>
       <div className={classes.videotitle}>
-        <h1 style={{ color: 'black' }}>NOW WATCHING</h1>
+        <h1 style={{ color: 'black', fontFamily: 'Redressed, cursive' }}>
+          NOW WATCHING
+        </h1>
         <div style={{ marginLeft: '20px', marginRight: '20px' }}>
           {curVideo.name !== '' ? curVideo.name : 'Nothing..'}
         </div>
-        <Button variant="contained" onClick={() => setMenuExpanded(true)}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setMenuExpanded(true)}
+        >
           Select a video
         </Button>
       </div>
