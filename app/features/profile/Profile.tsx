@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   makeStyles,
   createStyles,
@@ -16,6 +16,7 @@ import TextField from '@material-ui/core/TextField';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import { ipcRenderer } from 'electron';
 import NewWorkspaceDialog from './NewWorkspaceDialog';
+import NewPlaylistDialog from './NewPlaylistDialog';
 import WorkspaceInterface from './WorkspaceInterface';
 import {
   getCurrentTerm,
@@ -62,7 +63,6 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       justifyContent: 'space-between',
       alignItems: 'center',
-      borderBottom: '3px solid #7FC5DC',
       paddingBottom: '10px',
     },
     termrow: {
@@ -75,8 +75,8 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingBottom: '3vh',
     },
     workspacesdivparent: {
-      minHeight: '50vh',
-      maxHeight: '50vh',
+      minHeight: '35vh',
+      maxHeight: '35vh',
       width: '100%',
       overflow: 'hidden',
       height: '100%',
@@ -171,13 +171,16 @@ function WorkspaceEntry(props: WorkspaceEntryProps) {
 export default function Profile() {
   const [editingName, setEditingName] = useState(false);
   const [isWkOpen, setIsWkOpen] = useState(false);
+  const [playlistOpen, setPlaylistOpen] = useState(false);
   const classes = useStyles();
   const name = useSelector(getName);
   const allWorkspaces = useSelector(getAllWorkspaces);
   const currentTerm = useSelector(getCurrentTerm);
   const [nameChange, setNameChange] = useState('');
-  // const wkspace = useSelector(getCurrentTerm);
   const dispatch = useDispatch();
+
+  const openPlaylist = useCallback(() => setPlaylistOpen(true), []);
+  const openWorkspace = useCallback(() => setIsWkOpen(true), []);
 
   function handleWkClose(value: string) {
     if (value !== '' && !allWorkspaces.includes(value)) {
@@ -247,6 +250,22 @@ export default function Profile() {
                 </div>
               )}
             </div>
+            <div
+              style={{
+                borderBottom: '3px solid #7FC5DC',
+                paddingBottom: '5px',
+              }}
+            >
+              <Button
+                variant="contained"
+                size="small"
+                color="secondary"
+                style={{ maxWidth: 'max-content' }}
+                onClick={openPlaylist}
+              >
+                Edit playlist
+              </Button>
+            </div>
             <div className={classes.termrow}>
               <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <div style={{ marginRight: '1vw' }}>Selected Term:</div>
@@ -260,7 +279,7 @@ export default function Profile() {
                 variant="contained"
                 size="small"
                 color="secondary"
-                onClick={() => setIsWkOpen(true)}
+                onClick={openWorkspace}
                 style={{ maxWidth: 'max-content' }}
               >
                 Add a new workspace
@@ -269,6 +288,10 @@ export default function Profile() {
             <NewWorkspaceDialog
               isWkOpen={isWkOpen}
               handleWkClose={handleWkClose}
+            />
+            <NewPlaylistDialog
+              playlistOpen={playlistOpen}
+              setPlaylistOpen={setPlaylistOpen}
             />
             <div className={classes.workspacestitle}>Available Workspaces</div>
             <div className={classes.workspacesdivparent}>

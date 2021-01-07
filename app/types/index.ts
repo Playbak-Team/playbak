@@ -72,6 +72,11 @@ type NewWorkspaceDialogProps = {
   handleWkClose: (value: string) => void;
 };
 
+type NewPlaylistDialogProps = {
+  playlistOpen: boolean;
+  setPlaylistOpen: (value: boolean) => void;
+};
+
 type WorkspaceInterfaceProps = {
   workspace: string;
 };
@@ -89,4 +94,5 @@ export {
   EditEntryProps,
   NewWorkspaceDialogProps,
   WorkspaceInterfaceProps,
+  NewPlaylistDialogProps,
 };
