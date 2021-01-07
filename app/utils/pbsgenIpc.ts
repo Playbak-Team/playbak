@@ -6,28 +6,31 @@ const readline = require('readline');
 const { exec } = require('child_process');
 const folders = require('./playbakFolders');
 
-ipcMain.on('generate-pbs', async (event, filename: string) => {
-  exec(
-    `${folders.pbsgenPath} "${folders.ffmpegPath}" "${filename}"`,
-    (error: Error, stdout: string, stderr: string) => {
-      if (error || stderr) {
-        event.reply(
-          'show-snackbar',
-          `Failed to generated playback speed data. Error: ${error} stderr: ${stderr}`,
-          SnackbarSeverity.error
-        );
-        event.reply('return-pbsgen', filename, '');
-      } else if (stdout) {
-        event.reply(
-          'show-snackbar',
-          'Playback speed data generated successfully!',
-          SnackbarSeverity.success
-        );
-        event.reply('return-pbsgen', filename, stdout);
+ipcMain.on(
+  'generate-pbs',
+  async (event, courseName: string, filename: string) => {
+    exec(
+      `${folders.pbsgenPath} "${folders.ffmpegPath}" "${filename}"`,
+      (error: Error, stdout: string, stderr: string) => {
+        if (error || stderr) {
+          event.reply(
+            'show-snackbar',
+            `Failed to generated playback speed data. Error: ${error} stderr: ${stderr}`,
+            SnackbarSeverity.error
+          );
+          event.reply('return-pbsgen', courseName, filename, '');
+        } else if (stdout) {
+          event.reply(
+            'show-snackbar',
+            'Playback speed data generated successfully!',
+            SnackbarSeverity.success
+          );
+          event.reply('return-pbsgen', courseName, filename, stdout);
+        }
       }
-    }
-  );
-});
+    );
+  }
+);
 
 ipcMain.on('read-pbs', async (event, filename: string) => {
   if (fs.existsSync(filename)) {

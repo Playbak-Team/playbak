@@ -5,6 +5,8 @@ import { ipcRenderer } from 'electron';
 import { RootState } from '../../store';
 import { ProfileStateInterface } from '../../interfaces';
 
+import FileList from '../filelist/filelist';
+
 const initialState: ProfileStateInterface = {
   name: '',
   selectedWorkspace: '',
@@ -18,10 +20,12 @@ const profileSlice = createSlice({
   initialState,
   reducers: {
     setProfile: (_, action: PayloadAction<ProfileStateInterface>) => {
+      FileList.init(action.payload.selectedWorkspace);
       return action.payload;
     },
     setWorkspace: (state, action: PayloadAction<string>) => {
       state.selectedWorkspace = action.payload;
+      FileList.init(action.payload);
       ipcRenderer.send('get-courses', action.payload);
     },
     setAvailableWorkspaces: (state, action: PayloadAction<string[]>) => {
@@ -29,6 +33,7 @@ const profileSlice = createSlice({
     },
     addCourse: (state, action: PayloadAction<string>) => {
       state.courses.push(action.payload);
+      FileList.addCourse(action.payload);
       ipcRenderer.send(
         'create-new-course',
         state.selectedWorkspace,
@@ -37,6 +42,9 @@ const profileSlice = createSlice({
     },
     setCourses: (state, action: PayloadAction<string[]>) => {
       state.courses = action.payload;
+      action.payload.forEach((course) => {
+        FileList.addCourse(course);
+      });
       ipcRenderer.send('save-settings', JSON.stringify(state));
     },
     addWorkspace: (state, action: PayloadAction<string>) => {

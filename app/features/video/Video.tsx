@@ -25,6 +25,9 @@ import {
   emptyPBSData,
   emptyVideoData,
 } from '../../interfaces';
+
+import FileList from '../filelist/filelist';
+
 // import { FaceRounded } from '@material-ui/icons';
 
 const { ipcRenderer } = require('electron');
@@ -96,7 +99,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { video, setVideo } = props;
+  const { video, setVideo, course } = props;
 
   return (
     <div className={classes.videobutton}>
@@ -116,7 +119,7 @@ function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
           color="primary"
           aria-label="No playbak speed data found. Click to run PBSGen."
           onClick={() => {
-            ipcRenderer.send('generate-pbs', video.videoPath);
+            ipcRenderer.send('generate-pbs', course, video.videoPath);
           }}
         >
           <ErrorOutlineIcon />
@@ -158,42 +161,8 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 }
 
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
-  const dispatch = useDispatch();
-
   const { course, setVideo } = props;
-
-  const wkspace = useSelector(getCurrentTerm);
-  const [files, setFiles] = useState<VideoData[]>([]);
-
-  useEffect(() => {
-    ipcRenderer.on('return-videos', (_event, targetCourse, videos) => {
-      if (targetCourse === course) {
-        setFiles(videos);
-      }
-    });
-
-    ipcRenderer.on('return-pbsgen', (_event, filename, result) => {
-      if (result) {
-        const videoIndex = files.findIndex((vid) => vid.videoPath === filename);
-        if (videoIndex >= 0) {
-          const newFiles = [...files];
-          const newVideoData = { ...newFiles[videoIndex] };
-          newVideoData.pbsPath = result;
-          newFiles[videoIndex] = newVideoData;
-          setFiles(newFiles);
-        }
-      }
-    });
-
-    return () => {
-      ipcRenderer.removeAllListeners('return-videos');
-      ipcRenderer.removeAllListeners('return-pbsgen');
-    };
-  }, [files, course, dispatch]);
-
-  useEffect(() => {
-    ipcRenderer.send('get-videos', wkspace, course);
-  }, [course, wkspace]);
+  const files = FileList.getVideoFiles(course);
 
   return (
     <div className={styles.wrapcollabsible}>
@@ -214,6 +183,7 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
           {files.map((file) => (
             <CollapsibleCard
               video={file}
+              course={course}
               key={Math.random()}
               setVideo={setVideo}
             />
