@@ -9,7 +9,7 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
+import { getCurrentCourses } from '../profile/profileSlice';
 import { showInfo } from '../../components/Snackbar/snackBarSlice';
 
 import styles from './Video.css';
@@ -24,6 +24,8 @@ import {
   VideoData,
   emptyPBSData,
   emptyVideoData,
+  CourseData,
+  FileListUpdateType,
 } from '../../interfaces';
 
 import FileList from '../filelist/filelist';
@@ -162,7 +164,25 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 
 function MyCollapsible(props: CollapsibleProps): JSX.Element {
   const { course, setVideo } = props;
-  const files = FileList.getVideoFiles(course);
+  const [files, setFiles] = useState<VideoData[]>(
+    FileList.getVideoFiles(course)
+  );
+
+  useEffect(() => {
+    function handleCourseDataChanges(
+      type: FileListUpdateType,
+      data: CourseData
+    ): void {
+      if (type === FileListUpdateType.Video) {
+        console.log('handleCourseDataChanges called');
+        setFiles(data.video);
+      }
+    }
+    FileList.subscribeToCourseDataChanges(course, handleCourseDataChanges);
+    return () => {
+      FileList.unsubscribeToCourseDataChanges(course, handleCourseDataChanges);
+    };
+  });
 
   return (
     <div className={styles.wrapcollabsible}>

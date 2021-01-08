@@ -1,30 +1,23 @@
 import { ipcRenderer } from 'electron';
 
-import { VideoData } from '../../interfaces';
-
-interface CourseData {
-  video: VideoData[];
-  assign: VideoData[];
-  pdf: VideoData[];
-}
-
-const emptyCourseData = (): CourseData => ({
-  video: [],
-  assign: [],
-  pdf: [],
-});
+import {
+  VideoData,
+  CourseData,
+  emptyCourseData,
+  FileListUpdateType,
+  UpdateCallback,
+} from '../../interfaces';
 
 let wkspace = '';
 let courseData: { [name: string]: CourseData } = {};
+const courseUpdateCallbacks: { [name: string]: UpdateCallback[] } = {};
 
 const FileList = {
   init: (wkspaceName: string): void => {
     wkspace = wkspaceName;
     courseData = {};
-    console.log(`FileList init: ${wkspaceName}`);
   },
   addCourse: (courseName: string): void => {
-    console.log(`FileList addCourse: ${courseName}`);
     if (!(courseName in courseData)) {
       courseData[courseName] = emptyCourseData();
     }
@@ -38,38 +31,59 @@ const FileList = {
     return emptyCourseData();
   },
   readVideoFiles: (courseName: string): void => {
-    console.log(`FileList readVideoFiles: ${courseName}`);
     ipcRenderer.send('get-videos', wkspace, courseName);
   },
   setVideoFiles: (courseName: string, newVideoFiles: VideoData[]): void => {
-    console.log(
-      `FileList setVideoFiles: ${courseName} files: ${newVideoFiles}`
-    );
-
     if (!(courseName in courseData)) {
       FileList.addCourse(courseName);
     }
     courseData[courseName].video = newVideoFiles;
+    FileList.callUpdateCallbacks(courseName, FileListUpdateType.Video);
   },
   getVideoFiles: (courseName: string): VideoData[] => {
     return FileList.getCourseData(courseName).video;
   },
+  callUpdateCallbacks: (courseName: string, type: FileListUpdateType): void => {
+    if (courseName in courseUpdateCallbacks) {
+      courseUpdateCallbacks[courseName].forEach((fn) => {
+        fn(type, courseData[courseName]);
+      });
+    }
+  },
+  subscribeToCourseDataChanges: (
+    courseName: string,
+    fn: UpdateCallback
+  ): void => {
+    if (!(courseName in courseUpdateCallbacks)) {
+      courseUpdateCallbacks[courseName] = [fn];
+    } else {
+      courseUpdateCallbacks[courseName].push(fn);
+    }
+  },
+  unsubscribeToCourseDataChanges: (
+    courseName: string,
+    fn: UpdateCallback
+  ): void => {
+    if (courseName in courseUpdateCallbacks) {
+      courseUpdateCallbacks[courseName] = courseUpdateCallbacks[
+        courseName
+      ].filter((cb) => cb !== fn);
+    }
+  },
 };
 
 ipcRenderer.on('return-videos', (_event, targetCourse, videos) => {
-  console.log(targetCourse, videos);
   FileList.setVideoFiles(targetCourse, videos);
 });
 
 ipcRenderer.on('return-pbsgen', (_event, courseName, filename, result) => {
-  console.log(`FileList return-pbsgen: ${courseName} ${filename} ${result}`);
-
   const videoFiles = FileList.getVideoFiles(courseName);
   const videoIndex = videoFiles.findIndex((vid) => vid.videoPath === filename);
   if (videoIndex >= 0) {
     Object.assign(videoFiles[videoIndex], { pbsPath: result });
   }
-  console.log(videoFiles[videoIndex]);
+
+  FileList.callUpdateCallbacks(courseName, FileListUpdateType.Video);
 });
 
 Object.freeze(FileList);

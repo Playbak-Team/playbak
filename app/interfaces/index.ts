@@ -80,6 +80,26 @@ interface SnackbarStateInterface {
   snackbarSeverity: 'success' | 'info' | 'warning' | 'error' | undefined;
 }
 
+interface CourseData {
+  video: VideoData[];
+  assign: VideoData[];
+  pdf: VideoData[];
+}
+
+const emptyCourseData = (): CourseData => ({
+  video: [],
+  assign: [],
+  pdf: [],
+});
+
+enum FileListUpdateType {
+  Video = 1,
+  Assign,
+  PDF,
+}
+
+type UpdateCallback = (type: FileListUpdateType, data: CourseData) => void;
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   ProfileStateInterface,
@@ -94,4 +114,8 @@ export {
   emptyPBSData,
   SnackbarSeverity,
   SnackbarStateInterface,
+  CourseData,
+  emptyCourseData,
+  FileListUpdateType,
+  UpdateCallback,
 };
