@@ -33,7 +33,6 @@ import FileList from '../filelist/filelist';
 
 // import { FaceRounded } from '@material-ui/icons';
 
-
 const { ipcRenderer } = require('electron');
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -119,8 +118,6 @@ function CourseCard(props: CollapsibleCardProps): JSX.Element {
   const dispatch = useDispatch();
   const { video, setVideo, course } = props;
 
-  console.log(video);
-
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <ListItemIcon
@@ -177,11 +174,9 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
 }
 
 function DrawerList(props: CollapsibleProps): JSX.Element {
-  const dispatch = useDispatch();
   const classes = useStyles();
   const { course, setVideo } = props;
 
-  const wkspace = useSelector(getCurrentTerm);
   const [files, setFiles] = useState<VideoData[]>(
     FileList.getVideoFiles(course)
   );
