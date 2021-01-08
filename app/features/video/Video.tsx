@@ -14,7 +14,7 @@ import Collapse from '@material-ui/core/Collapse';
 import List from '@material-ui/core/List';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { showInfo } from '../../components/Snackbar/snackBarSlice';
-import { getCurrentCourses, getCurrentTerm } from '../profile/profileSlice';
+import { getCurrentCourses } from '../profile/profileSlice';
 import {
   CollapsibleProps,
   CollapsibleCardProps,
@@ -25,7 +25,14 @@ import {
   VideoData,
   emptyPBSData,
   emptyVideoData,
+  CourseData,
+  FileListUpdateType,
 } from '../../interfaces';
+
+import FileList from '../filelist/filelist';
+
+// import { FaceRounded } from '@material-ui/icons';
+
 
 const { ipcRenderer } = require('electron');
 
@@ -110,7 +117,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function CourseCard(props: CollapsibleCardProps): JSX.Element {
   const dispatch = useDispatch();
-  const { video, setVideo } = props;
+  const { video, setVideo, course } = props;
 
   console.log(video);
 
@@ -128,7 +135,7 @@ function CourseCard(props: CollapsibleCardProps): JSX.Element {
       {!video.pbsPath && (
         <ListItemIcon
           onClick={() => {
-            ipcRenderer.send('generate-pbs', video.videoPath);
+            ipcRenderer.send('generate-pbs', course, video.videoPath);
           }}
         >
           <ErrorOutlineIcon />
@@ -175,42 +182,29 @@ function DrawerList(props: CollapsibleProps): JSX.Element {
   const { course, setVideo } = props;
 
   const wkspace = useSelector(getCurrentTerm);
-  const [files, setFiles] = useState<VideoData[]>([]);
+  const [files, setFiles] = useState<VideoData[]>(
+    FileList.getVideoFiles(course)
+  );
   const [open, setOpen] = React.useState(false);
 
   function handleClick() {
     setOpen(!open);
   }
-
   useEffect(() => {
-    ipcRenderer.on('return-videos', (_event, targetCourse, videos) => {
-      if (targetCourse === course) {
-        setFiles(videos);
+    function handleCourseDataChanges(
+      type: FileListUpdateType,
+      data: CourseData
+    ): void {
+      if (type === FileListUpdateType.Video) {
+        console.log('handleCourseDataChanges called');
+        setFiles(data.video);
       }
-    });
-
-    ipcRenderer.on('return-pbsgen', (_event, filename, result) => {
-      if (result) {
-        const videoIndex = files.findIndex((vid) => vid.videoPath === filename);
-        if (videoIndex >= 0) {
-          const newFiles = [...files];
-          const newVideoData = { ...newFiles[videoIndex] };
-          newVideoData.pbsPath = result;
-          newFiles[videoIndex] = newVideoData;
-          setFiles(newFiles);
-        }
-      }
-    });
-
+    }
+    FileList.subscribeToCourseDataChanges(course, handleCourseDataChanges);
     return () => {
-      ipcRenderer.removeAllListeners('return-videos');
-      ipcRenderer.removeAllListeners('return-pbsgen');
+      FileList.unsubscribeToCourseDataChanges(course, handleCourseDataChanges);
     };
   }, []);
-
-  useEffect(() => {
-    ipcRenderer.send('get-videos', wkspace, course);
-  }, [course, wkspace]);
 
   return (
     <div className={classes.list}>
@@ -222,7 +216,7 @@ function DrawerList(props: CollapsibleProps): JSX.Element {
         <List component="div" disablePadding>
           {files.map((file) => (
             <ListItem key={Math.random()} button className={classes.nested}>
-              <CourseCard video={file} setVideo={setVideo} />
+              <CourseCard video={file} course={course} setVideo={setVideo} />
             </ListItem>
           ))}
         </List>

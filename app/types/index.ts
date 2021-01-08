@@ -7,6 +7,7 @@ type CollapsibleProps = {
 };
 
 type CollapsibleCardProps = {
+  course: string;
   video: VideoData;
   setVideo: React.Dispatch<React.SetStateAction<VideoData>>;
 };
