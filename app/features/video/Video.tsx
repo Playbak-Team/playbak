@@ -191,7 +191,6 @@ function DrawerList(props: CollapsibleProps): JSX.Element {
       data: CourseData
     ): void {
       if (type === FileListUpdateType.Video) {
-        console.log('handleCourseDataChanges called');
         setFiles([...data.video]);
       }
     }
