@@ -2,18 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import { getCurrentCourses } from '../profile/profileSlice';
+import Button from '@material-ui/core/Button';
+import Drawer from '@material-ui/core/Drawer';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import Collapse from '@material-ui/core/Collapse';
+import List from '@material-ui/core/List';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { showInfo } from '../../components/Snackbar/snackBarSlice';
-
-import styles from './Video.css';
-
+import { getCurrentCourses } from '../profile/profileSlice';
 import {
   CollapsibleProps,
   CollapsibleCardProps,
@@ -32,6 +33,7 @@ import FileList from '../filelist/filelist';
 
 // import { FaceRounded } from '@material-ui/icons';
 
+
 const { ipcRenderer } = require('electron');
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -41,6 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
       overflowX: 'hidden',
       overflowY: 'hidden',
       height: '100vh',
+      backgroundColor: 'white',
     },
     paper: {
       padding: theme.spacing(2),
@@ -50,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) =>
     videocontainer: {
       padding: theme.spacing(4),
       textAlign: 'center',
-      color: theme.palette.text.secondary,
+      backgroundColor: 'transparent',
       height: '80vh',
       maxHeight: '80vh',
     },
@@ -95,37 +98,48 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       flexGrow: 1,
     },
+    videotitle: {
+      display: 'flex',
+      flexDirection: 'row',
+      color: 'black',
+      alignItems: 'center',
+      marginBottom: '-30px',
+      marginLeft: '30px',
+    },
+    list: {
+      width: 250,
+    },
+    nested: {
+      paddingLeft: theme.spacing(4),
+    },
   })
 );
 
-function CollapsibleCard(props: CollapsibleCardProps): JSX.Element {
-  const classes = useStyles();
+function CourseCard(props: CollapsibleCardProps): JSX.Element {
   const dispatch = useDispatch();
   const { video, setVideo, course } = props;
 
+  console.log(video);
+
   return (
-    <div className={classes.videobutton}>
-      <IconButton
-        color="primary"
-        aria-label="Select"
+    <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <ListItemIcon
         onClick={() => {
           dispatch(showInfo(`Playing ${video.name}`));
           setVideo(video);
         }}
       >
         <PlayCircleOutlineIcon />
-      </IconButton>
-      {video.name}
+      </ListItemIcon>
+      <ListItemText primary={video.name} />
       {!video.pbsPath && (
-        <IconButton
-          color="primary"
-          aria-label="No playbak speed data found. Click to run PBSGen."
+        <ListItemIcon
           onClick={() => {
             ipcRenderer.send('generate-pbs', course, video.videoPath);
           }}
         >
           <ErrorOutlineIcon />
-        </IconButton>
+        </ListItemIcon>
       )}
     </div>
   );
@@ -162,12 +176,20 @@ function VideoPlayer(props: VideoPlayerProps): JSX.Element {
   );
 }
 
-function MyCollapsible(props: CollapsibleProps): JSX.Element {
+function DrawerList(props: CollapsibleProps): JSX.Element {
+  const dispatch = useDispatch();
+  const classes = useStyles();
   const { course, setVideo } = props;
+
+  const wkspace = useSelector(getCurrentTerm);
   const [files, setFiles] = useState<VideoData[]>(
     FileList.getVideoFiles(course)
   );
+  const [open, setOpen] = React.useState(false);
 
+  function handleClick() {
+    setOpen(!open);
+  }
   useEffect(() => {
     function handleCourseDataChanges(
       type: FileListUpdateType,
@@ -182,41 +204,30 @@ function MyCollapsible(props: CollapsibleProps): JSX.Element {
     return () => {
       FileList.unsubscribeToCourseDataChanges(course, handleCourseDataChanges);
     };
-  });
+  }, []);
 
   return (
-    <div className={styles.wrapcollabsible}>
-      <input
-        key={Math.random()}
-        id={`${course.toString()}-collapsible`}
-        className={styles.toggle}
-        type="checkbox"
-      />
-      <label
-        htmlFor={`${course.toString()}-collapsible`}
-        className={styles.lbltoggle}
-      >
-        {course}
-      </label>
-      <div className={styles.collapsiblecontent}>
-        <div className={styles.contentinner}>
+    <div className={classes.list}>
+      <ListItem button onClick={handleClick}>
+        <ListItemText primary={course} />
+        {open ? <ExpandLess /> : <ExpandMore />}
+      </ListItem>
+      <Collapse in={open} timeout="auto">
+        <List component="div" disablePadding>
           {files.map((file) => (
-            <CollapsibleCard
-              video={file}
-              course={course}
-              key={Math.random()}
-              setVideo={setVideo}
-            />
+            <ListItem key={Math.random()} button className={classes.nested}>
+              <CourseCard video={file} course={course} setVideo={setVideo} />
+            </ListItem>
           ))}
-        </div>
-      </div>
+        </List>
+      </Collapse>
     </div>
   );
 }
 
 export default function Video() {
   const classes = useStyles();
-  const [menuExpanded, setMenuExpanded] = useState<boolean>(true);
+  const [menuExpanded, setMenuExpanded] = useState<boolean>(false);
   const [pbsData, setPBSData] = useState<PBSData>(emptyPBSData());
   const [curVideo, setVideo] = useState<VideoData>(emptyVideoData());
 
@@ -238,42 +249,46 @@ export default function Video() {
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={1}>
-        <Grid item xs={menuExpanded ? 3 : 1}>
-          <Paper className={`${classes.paper} ${classes.selection}`}>
-            {menuExpanded ? (
-              <div>
-                <div className={classes.selectiontop}>
-                  <IconButton
-                    color="primary"
-                    aria-label="Select"
-                    onClick={() => setMenuExpanded(false)}
-                  >
-                    <ChevronLeftIcon />
-                  </IconButton>
-                </div>
-                {currentCourses.map((dir: string) => (
-                  <MyCollapsible key={dir} course={dir} setVideo={setVideo} />
-                ))}
-              </div>
-            ) : (
-              <IconButton
-                color="primary"
-                aria-label="Select"
-                onClick={() => setMenuExpanded(true)}
-              >
-                <ChevronRightIcon />
-              </IconButton>
-            )}
-          </Paper>
-        </Grid>
-        <Grid item xs={menuExpanded ? 9 : 11}>
-          <Paper className={classes.videocontainer}>
-            {curVideo.name}
-            <VideoPlayer video={curVideo} pbsData={pbsData} />
-          </Paper>
-        </Grid>
-      </Grid>
+      <div className={classes.videotitle}>
+        <h1 style={{ color: 'black', fontFamily: 'Redressed, cursive' }}>
+          NOW WATCHING
+        </h1>
+        <div
+          style={{
+            marginLeft: '20px',
+          }}
+        >
+          {curVideo.name !== '' ? curVideo.name : 'Nothing..'}
+        </div>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setMenuExpanded(true)}
+          style={{
+            alignSelf: 'flex-end',
+            marginLeft: 'auto',
+            marginBottom: '20px',
+            marginRight: '30px',
+          }}
+        >
+          Select a video
+        </Button>
+      </div>
+      <div className={classes.videocontainer}>
+        {curVideo.name}
+        <VideoPlayer video={curVideo} pbsData={pbsData} />
+      </div>
+      <Drawer
+        anchor="left"
+        open={menuExpanded}
+        onClose={() => setMenuExpanded(false)}
+      >
+        <div style={{ marginTop: '30px' }}>
+          {currentCourses.map((dir: string) => (
+            <DrawerList key={dir} course={dir} setVideo={setVideo} />
+          ))}
+        </div>
+      </Drawer>
     </div>
   );
 }
