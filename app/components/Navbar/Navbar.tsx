@@ -35,30 +35,6 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'block',
       },
     },
-    search: {
-      position: 'relative',
-      borderRadius: theme.shape.borderRadius,
-      backgroundColor: fade(theme.palette.common.white, 0.15),
-      '&:hover': {
-        backgroundColor: fade(theme.palette.common.white, 0.25),
-      },
-      marginRight: theme.spacing(2),
-      marginLeft: 0,
-      width: '100%',
-      [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(3),
-        width: 'auto',
-      },
-    },
-    searchIcon: {
-      padding: theme.spacing(0, 2),
-      height: '100%',
-      position: 'absolute',
-      pointerEvents: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
     inputRoot: {
       color: 'inherit',
     },
@@ -74,15 +50,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     sectionDesktop: {
       display: 'none',
-      [theme.breakpoints.up('md')]: {
-        display: 'flex',
-      },
-    },
-    sectionMobile: {
-      display: 'flex',
-      [theme.breakpoints.up('md')]: {
-        display: 'none',
-      },
     },
     navbarStyle: {
       backgroundColor: '#323639',
@@ -135,7 +102,7 @@ export default function PrimarySearchAppBar() {
   );
 
   return (
-    <div className={classes.grow}>
+    <>
       <AppBar
         position="static"
         color="transparent"
@@ -148,7 +115,7 @@ export default function PrimarySearchAppBar() {
             </IconButton>
           </Link>
           <div className={classes.grow} />
-          <div className={classes.sectionDesktop}>
+          <div>
             <Link to={routes.KANBAN}>
               <IconButton aria-label="go to kanban" color="inherit">
                 <ListAltIcon />
@@ -190,6 +157,6 @@ export default function PrimarySearchAppBar() {
         </Toolbar>
       </AppBar>
       {renderMenu}
-    </div>
+    </>
   );
 }
