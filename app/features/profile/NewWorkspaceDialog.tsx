@@ -7,7 +7,9 @@ import TextField from '@material-ui/core/TextField/TextField';
 import React, { useState } from 'react';
 import { NewWorkspaceDialogProps } from '../../types';
 
-export default function NewWorkspaceDialog(props: NewWorkspaceDialogProps) {
+const NewWorkspaceDialog = React.memo(function NewDialog(
+  props: NewWorkspaceDialogProps
+) {
   const { isWkOpen, handleWkClose } = props;
   const [enteredName, setEnteredName] = useState('');
 
@@ -42,4 +44,6 @@ export default function NewWorkspaceDialog(props: NewWorkspaceDialogProps) {
       </DialogActions>
     </Dialog>
   );
-}
+});
+
+export default NewWorkspaceDialog;

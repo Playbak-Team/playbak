@@ -86,6 +86,18 @@ interface CourseData {
   pdf: VideoData[];
 }
 
+interface TabPanelProps {
+  // eslint-disable-next-line react/require-default-props
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
+
+interface StyledTabsProps {
+  value: number;
+  onChange: (event, newValue: number) => void;
+}
+
 const emptyCourseData = (): CourseData => ({
   video: [],
   assign: [],
@@ -118,4 +130,6 @@ export {
   emptyCourseData,
   FileListUpdateType,
   UpdateCallback,
+  TabPanelProps,
+  StyledTabsProps,
 };

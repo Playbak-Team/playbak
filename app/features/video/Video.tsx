@@ -116,28 +116,21 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function CourseCard(props: CollapsibleCardProps): JSX.Element {
   const dispatch = useDispatch();
-  const { video, setVideo, course } = props;
+  const { video, setVideo } = props;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <ListItemIcon
-        onClick={() => {
-          dispatch(showInfo(`Playing ${video.name}`));
-          setVideo(video);
-        }}
-      >
+    <div
+      style={{ display: 'flex', flexDirection: 'row' }}
+      onClick={() => {
+        dispatch(showInfo(`Playing ${video.name}`));
+        setVideo(video);
+      }}
+      aria-hidden="true"
+    >
+      <ListItemIcon>
         <PlayCircleOutlineIcon />
       </ListItemIcon>
       <ListItemText primary={video.name} />
-      {!video.pbsPath && (
-        <ListItemIcon
-          onClick={() => {
-            ipcRenderer.send('generate-pbs', course, video.videoPath);
-          }}
-        >
-          <ErrorOutlineIcon />
-        </ListItemIcon>
-      )}
     </div>
   );
 }
@@ -227,6 +220,8 @@ export default function Video() {
 
   const currentCourses = useSelector(getCurrentCourses);
 
+  console.log(pbsData);
+
   useEffect(() => {
     ipcRenderer.on('return-pbs', (_event, data) => {
       setPBSData(data);
@@ -238,6 +233,8 @@ export default function Video() {
   useEffect(() => {
     if (curVideo.pbsPath) {
       ipcRenderer.send('read-pbs', curVideo.pbsPath);
+    } else {
+      setPBSData(emptyPBSData);
     }
   }, [curVideo]);
 
