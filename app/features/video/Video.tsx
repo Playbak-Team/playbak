@@ -224,7 +224,7 @@ export default function Video() {
 
   useEffect(() => {
     ipcRenderer.on('return-pbs', (_event, data) => {
-      setPBSData(data);
+      setPBSData({ ...data });
     });
     return () => {
       ipcRenderer.removeAllListeners('return-pbs');
@@ -234,7 +234,7 @@ export default function Video() {
     if (curVideo.pbsPath) {
       ipcRenderer.send('read-pbs', curVideo.pbsPath);
     } else {
-      setPBSData(emptyPBSData);
+      setPBSData(emptyPBSData());
     }
   }, [curVideo]);
 
