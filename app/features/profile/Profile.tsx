@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   makeStyles,
   createStyles,
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      background: '#06170e',
+      background: '#00011a',
       boxShadow:
         '8px 0px 0px 0px #DCD0C0, 0px 8px 0px 0px #B1938B, -8px 0px 0px 0px #4E4E56, 0px 0px 0px 8px #DA635D, 5px 5px 15px 5px rgba(0,0,0,0)',
     },
@@ -143,7 +143,9 @@ const CssTextField = withStyles({
   },
 })(TextField);
 
-function WorkspaceEntry(props: WorkspaceEntryProps) {
+const WorkspaceEntry = React.memo(function WorkspaceE(
+  props: WorkspaceEntryProps
+) {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { name } = props;
@@ -160,13 +162,7 @@ function WorkspaceEntry(props: WorkspaceEntryProps) {
       </IconButton>
     </div>
   );
-}
-
-// function CourseEntry(props: CourseEntryProps) {
-//   const classes = useStyles();
-//   const { name } = props;
-//   return <div className={classes.workspaceentry}>{name}</div>;
-// }
+});
 
 export default function Profile() {
   const [editingName, setEditingName] = useState(false);
@@ -176,8 +172,8 @@ export default function Profile() {
   const allWorkspaces = useSelector(getAllWorkspaces);
   const currentTerm = useSelector(getCurrentTerm);
   const [nameChange, setNameChange] = useState('');
-  // const wkspace = useSelector(getCurrentTerm);
   const dispatch = useDispatch();
+  const setEditingNameTrue = useCallback(() => setEditingName(true), []);
 
   function handleWkClose(value: string) {
     if (value !== '' && !allWorkspaces.includes(value)) {
@@ -240,7 +236,7 @@ export default function Profile() {
                     style={{ fontSize: 60 }}
                     aria-label="edit name"
                     id="edit-name"
-                    onClick={() => setEditingName(true)}
+                    onClick={setEditingNameTrue}
                   >
                     <EditIcon />
                   </IconButton>

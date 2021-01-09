@@ -1,11 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useState } from 'react';
-import {
-  makeStyles,
-  withStyles,
-  createStyles,
-  Theme,
-} from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -13,81 +8,13 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import { WorkspaceInterfaceProps } from '../../types';
 import { getCurrentCourses, addCourse } from './profileSlice';
 import {
   showSuccess,
   showError,
 } from '../../components/Snackbar/snackBarSlice';
-
-interface TabPanelProps {
-  // eslint-disable-next-line react/require-default-props
-  children?: React.ReactNode;
-  index: any;
-  value: any;
-}
-
-interface StyledTabsProps {
-  value: number;
-  onChange: (event, newValue: number) => void;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`scrollable-prevent-tabpanel-${index}`}
-      aria-labelledby={`scrollable-prevent-tab-${index}`}
-      {...other}
-    >
-      {value === index && <div>{children}</div>}
-    </div>
-  );
-}
-
-const StyledTabs = withStyles({
-  indicator: {
-    display: 'flex',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-    '& > span': {
-      maxWidth: 60,
-      width: '100%',
-      backgroundColor: 'white',
-    },
-  },
-})((props: StyledTabsProps) => (
-  <Tabs
-    {...props}
-    variant="scrollable"
-    scrollButtons="auto"
-    TabIndicatorProps={{ children: <span /> }}
-  />
-));
-
-interface StyledTabProps {
-  label: string;
-}
-
-const StyledTab = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      textTransform: 'none',
-      color: '#fff',
-      fontWeight: theme.typography.fontWeightRegular,
-      fontSize: theme.typography.pxToRem(15),
-      marginRight: theme.spacing(1),
-      '&:focus': {
-        opacity: 1,
-      },
-    },
-  })
-)((props: StyledTabProps) => <Tab disableRipple {...props} />);
+import CourseUI from './CourseUI';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -115,44 +42,12 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const NoWorkspacePrompt = () => {
+const NoWorkspacePrompt = React.memo(function EmptyPrompt() {
   const classes = useStyles();
   return <div className={classes.noworkspace}>Please activate a workspace</div>;
-};
+});
 
-const CourseUI = () => {
-  const courses = useSelector(getCurrentCourses);
-  const classes = useStyles();
-  const [value, setValue] = useState(0);
-
-  const handleChange = (_event, newValue: number) => {
-    setValue(newValue);
-  };
-
-  return (
-    <div className={classes.root}>
-      <StyledTabs
-        value={value}
-        onChange={handleChange}
-        aria-label="styled tabs"
-      >
-        {courses.map((v) => (
-          <StyledTab key={v} label={v}>
-            <div>x foking d</div>
-          </StyledTab>
-        ))}
-      </StyledTabs>
-
-      {courses.map((v, k) => (
-        <TabPanel value={value} key={v} index={k}>
-          <div style={{ margin: '15px' }}>{v}</div>
-        </TabPanel>
-      ))}
-    </div>
-  );
-};
-
-const WorkspaceInfo = (props: { title: string }) => {
+const WorkspaceInfo = React.memo(function WI(props: { title: string }) {
   const { title } = props;
   const [open, setOpen] = useState(false);
   const [courseName, setCourseName] = useState('');
@@ -215,7 +110,7 @@ const WorkspaceInfo = (props: { title: string }) => {
       </div>
     </div>
   );
-};
+});
 
 export default function WorkspaceInterface(props: WorkspaceInterfaceProps) {
   const { workspace } = props;
