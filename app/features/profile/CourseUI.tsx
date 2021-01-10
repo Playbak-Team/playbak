@@ -13,6 +13,7 @@ import FolderIcon from '@material-ui/icons/Folder';
 import Collapse from '@material-ui/core/Collapse';
 import CheckIcon from '@material-ui/icons/Check';
 import ErrorIcon from '@material-ui/icons/Error';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -25,7 +26,7 @@ import {
   FileListUpdateType,
   CourseData,
 } from '../../interfaces';
-import { getCurrentCourses } from './profileSlice';
+import { getCurrentCourses, getCurrentTerm } from './profileSlice';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -170,6 +171,7 @@ const CourseContent = (props: { name: string }) => {
   const [showAssignments, setShowAssignments] = useState<boolean>(false);
   const [showVideos, setShowVideos] = useState<boolean>(false);
   const [files, setFiles] = useState<VideoData[]>(FileList.getVideoFiles(name));
+  const wkspace = useSelector(getCurrentTerm);
 
   useEffect(() => {
     function handleCourseDataChanges(
@@ -185,6 +187,14 @@ const CourseContent = (props: { name: string }) => {
       FileList.unsubscribeToCourseDataChanges(name, handleCourseDataChanges);
     };
   });
+
+  const openVideoFolder = useCallback(
+    (e) => {
+      e.stopPropagation();
+      ipcRenderer.send('openVideoFolder', wkspace, name);
+    },
+    [wkspace, name]
+  );
 
   return (
     <div className={classes.contentBody}>
@@ -213,6 +223,11 @@ const CourseContent = (props: { name: string }) => {
       >
         <FolderIcon className={classes.spacedIcon} />
         Videos
+        <Tooltip title="Open Folder" onClick={openVideoFolder}>
+          <IconButton>
+            <OpenInNewIcon />
+          </IconButton>
+        </Tooltip>
       </div>
       <Collapse in={showVideos}>
         <>

@@ -22,6 +22,7 @@ import MenuBuilder from './menu';
 import { SnackbarSeverity } from './interfaces';
 
 const fs = require('fs');
+const { shell } = require('electron');
 const folders = require('./utils/playbakFolders');
 
 require('./utils/mainIpc');
@@ -161,6 +162,14 @@ ipcMain.on('get-videos', async (event, wkspace: string, course: string) => {
     event.reply('return-videos', course, []);
   }
 });
+
+ipcMain.on(
+  'openVideoFolder',
+  async (_event, wkspace: string, course: string) => {
+    // TODO: Replace with openPath when upgrading electron.
+    shell.openItem(folders.getCourseVideoDir(wkspace, course));
+  }
+);
 
 export default class AppUpdater {
   constructor() {
