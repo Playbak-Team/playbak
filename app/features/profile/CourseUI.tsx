@@ -223,6 +223,7 @@ const CourseContent = (props: { name: string }) => {
       >
         <FolderIcon className={classes.spacedIcon} />
         Videos
+        <div className={classes.divider} />
         <Tooltip title="Open Folder" onClick={openVideoFolder}>
           <IconButton>
             <OpenInNewIcon />
