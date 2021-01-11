@@ -77,13 +77,19 @@ ipcRenderer.on('return-videos', (_event, targetCourse, videos) => {
 });
 
 ipcRenderer.on('return-pbsgen', (_event, courseName, filename, result) => {
-  const videoFiles = FileList.getVideoFiles(courseName);
-  const videoIndex = videoFiles.findIndex((vid) => vid.videoPath === filename);
-  if (videoIndex >= 0) {
-    Object.assign(videoFiles[videoIndex], { pbsPath: result });
-  }
+  // const videoFiles = FileList.getVideoFiles(courseName);
+  // const videoIndex = videoFiles.findIndex((vid) => vid.videoPath === filename);
+  // if (videoIndex >= 0) {
+  //   Object.assign(videoFiles[videoIndex], { pbsPath: result });
+  // }
+  // FileList.callUpdateCallbacks(courseName, FileListUpdateType.Video);
+});
 
-  FileList.callUpdateCallbacks(courseName, FileListUpdateType.Video);
+ipcRenderer.on('file-update', (_event, newFile) => {
+  // TODO: modify courseData directly, instead of rescan.
+  Object.keys(courseData).forEach((courseName) => {
+    FileList.readVideoFiles(courseName);
+  });
 });
 
 Object.freeze(FileList);

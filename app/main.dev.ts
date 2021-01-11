@@ -23,6 +23,7 @@ import { SnackbarSeverity } from './interfaces';
 
 const fs = require('fs');
 const { shell } = require('electron');
+const chokidar = require('chokidar');
 const folders = require('./utils/playbakFolders');
 
 require('./utils/mainIpc');
@@ -272,6 +273,16 @@ const createWindow = async () => {
   menuBuilder.buildMenu();
 
   mainWindow.removeMenu();
+
+  chokidar
+    .watch(folders.workspaceRootDir, { ignoreInitial: true })
+    .on('all', (event: string, changedPath: string) => {
+      if (event === 'add' || event === 'change' || event === 'unlink') {
+        if (mainWindow) {
+          mainWindow.webContents.send('file-update', changedPath);
+        }
+      }
+    });
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
