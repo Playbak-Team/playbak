@@ -28,6 +28,3 @@ jobs:
           yarn tsc
           yarn test
           yarn build-e2e
-      - name: yarn test-e2e
-        run: |
-          yarn test-e2e
