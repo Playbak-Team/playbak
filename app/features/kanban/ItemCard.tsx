@@ -11,13 +11,15 @@ import ScheduleIcon from '@material-ui/icons/Schedule';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import IconButton from '@material-ui/core/IconButton';
 import { EntryCardProps } from '../../types';
+import { LabelDiv, CardDiv } from './styledComponents';
+import { getUrgencyColor, getItemStyle } from './utils';
 
 const useStyles = makeStyles(() =>
   createStyles({
     entry: {
       backgroundColor: 'white',
-      maxWidth: '85%',
-      minHeight: '50px',
+      maxWidth: '90%',
+      minHeight: '70px',
       maxHeight: 'max-content',
       margin: '10px',
       padding: '10px',
@@ -32,42 +34,43 @@ const useStyles = makeStyles(() =>
     cardEntryTitle: {
       color: 'black',
       margin: '0',
+      marginTop: '-5px',
     },
   })
 );
 
-const getItemStyle = (isDragging, draggableStyle) => ({
-  // some basic styles to make the items look a bit nicer
-  userSelect: 'none',
-
-  // change background colour if dragging
-  background: isDragging ? '#97CBFF' : 'white',
-
-  border: isDragging ? '2px solid black' : 'none',
-
-  // styles we need to apply on draggables
-  ...draggableStyle,
-});
-
 const ItemCard = (props: EntryCardProps) => {
-  const { og, id, title, label, duedate, index, openCardInfo, removeE } = props;
+  const {
+    og,
+    id,
+    title,
+    label,
+    duedate,
+    index,
+    openCardInfo,
+    removeE,
+    completed,
+  } = props;
   const classes = useStyles();
   const [urgent, setUrgent] = useState(false);
+  const [overdue, setOverdue] = useState(false);
 
   useEffect(() => {
     const today = new Date();
     const due = new Date(duedate);
 
-    if ((due.getTime() - today.getTime()) / 3600000 <= 24) {
-      setUrgent(true);
-    } else {
-      setUrgent(false);
-    }
+    setUrgent((due.getTime() - today.getTime()) / 3600000 <= 24);
+    setOverdue(due.getTime() < today.getTime());
   }, [duedate]);
 
   return (
     <div>
-      <Draggable key={id} draggableId={id.toString()} index={index}>
+      <Draggable
+        id="draggable-card"
+        key={id}
+        draggableId={id.toString()}
+        index={index}
+      >
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <div
             ref={provided.innerRef}
@@ -80,31 +83,16 @@ const ItemCard = (props: EntryCardProps) => {
             )}
           >
             <div className={classes.entryInner}>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginBottom: '10px',
-                }}
-              >
-                <div
-                  style={{
-                    backgroundColor: 'grey',
-                    maxWidth: 'max-content',
-                    maxHeight: '15px',
-                    border: '1px solid grey',
-                    borderRadius: '15px',
-                    padding: '5px',
-                    fontSize: '12px',
-                    color: 'white',
-                    textAlign: 'center',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
+              <CardDiv>
+                <LabelDiv
+                  bgColor={
+                    localStorage.getItem(label)
+                      ? localStorage.getItem(label)
+                      : '#000000'
+                  }
                 >
                   {label}
-                </div>
+                </LabelDiv>
                 <div>
                   <IconButton
                     onClick={() => openCardInfo(og)}
@@ -119,7 +107,7 @@ const ItemCard = (props: EntryCardProps) => {
                     <HighlightOffIcon />
                   </IconButton>
                 </div>
-              </div>
+              </CardDiv>
               <h3 className={classes.cardEntryTitle}>{title}</h3>
               <div
                 style={{
@@ -127,14 +115,14 @@ const ItemCard = (props: EntryCardProps) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   marginTop: '15px',
-                  backgroundColor: urgent ? '#FF8484' : 'transparent',
+                  backgroundColor: getUrgencyColor(urgent, overdue, completed),
                   maxWidth: 'max-content',
                   padding: '3px',
                   borderRadius: '3px',
                 }}
               >
                 <ScheduleIcon style={{ marginRight: '5px' }} />
-                {duedate}
+                {duedate.replace('T', ' | ')}
               </div>
             </div>
           </div>

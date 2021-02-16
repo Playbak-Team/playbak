@@ -43,3 +43,7 @@ a:hover {
   text-decoration: none;
   cursor: pointer;
 }
+
+.window-title {
+  color: '#1B1E2B';
+}

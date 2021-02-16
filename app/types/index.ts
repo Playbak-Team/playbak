@@ -56,6 +56,7 @@ type EntryCardProps = {
   duedate: string;
   belongsto: string;
   index: number;
+  completed: string;
   openCardInfo: (info: string) => void;
   removeE: (name: string) => void;
 };

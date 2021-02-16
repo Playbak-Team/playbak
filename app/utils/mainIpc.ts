@@ -72,7 +72,7 @@ ipcMain.on('add-entry', async (event, entry: string) => {
   await db.serialize(async () => {
     const v = entry.split(',');
     db.run(
-      `INSERT INTO entry VALUES (?,"${v[1]}","${v[2]}","${v[3]}","${v[4]}","${v[5]}","${v[6]}")`
+      `INSERT INTO entry VALUES (?,"${v[1]}","${v[2]}","${v[3]}","${v[4]}","${v[5]}","${v[6]}","${v[7]}")`
     );
   });
   db.close();
@@ -144,14 +144,10 @@ ipcMain.on('replace-entry', async (event, entry: string) => {
   const v = entry.split(',');
   await db.serialize(() => {
     db.run(
-      `UPDATE entry SET title= "${v[1]}", subtitle="${v[2]}", description="${v[3]}", label="${v[4]}", duedate="${v[5]}", belongsto="${v[6]}" WHERE id=${v[0]}`
+      `UPDATE entry SET title= "${v[1]}", subtitle="${v[2]}", description="${v[3]}", label="${v[4]}", duedate="${v[5]}", belongsto="${v[6]}", completed=${v[7]} WHERE id=${v[0]}`
     );
   });
   db.close();
-  event.reply(
-    'yikes',
-    `UPDATE entry SET title= "${v[1]}", subtitle="${v[2]}", description="${v[3]}", label="${v[4]}", duedate="${v[5]}", belongsto="${v[6]}" WHERE id=${v[0]}`
-  );
 });
 
 ipcMain.on('load-kanban', async (event, workspace: string) => {
@@ -176,7 +172,7 @@ ipcMain.on('load-kanban', async (event, workspace: string) => {
     const c = cols.map((ob) => ob.name);
     const e = events.map(
       (ob) =>
-        `${ob.id},${ob.title},${ob.subtitle},${ob.description},${ob.label},${ob.duedate},${ob.belongsto}`
+        `${ob.id},${ob.title},${ob.subtitle},${ob.description},${ob.label},${ob.duedate},${ob.belongsto},${ob.completed}`
     );
 
     event.reply('kanban-data', [c, e]);
@@ -274,7 +270,7 @@ ipcMain.on('create-new-workspace', async (event, name: string) => {
     db.serialize(() => {
       db.run('CREATE TABLE columns (name TEXT NOT NULL PRIMARY KEY)');
       db.run(
-        'CREATE TABLE entry (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, subtitle TEXT, description TEXT, label TEXT, duedate TEXT, belongsto TEXT)'
+        'CREATE TABLE entry (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, subtitle TEXT, description TEXT, label TEXT, duedate TEXT, belongsto TEXT, completed INTEGER)'
       );
     });
 

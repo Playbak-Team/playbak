@@ -16,7 +16,7 @@ type Props = {
 const Root = ({ store, history }: Props) => (
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <Navbar />
+      {/* <Navbar /> */}
       <Routes />
       <SnackBar />
     </ConnectedRouter>

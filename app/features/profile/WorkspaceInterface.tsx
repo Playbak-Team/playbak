@@ -15,6 +15,7 @@ import {
   showError,
 } from '../../components/Snackbar/snackBarSlice';
 import CourseUI from './CourseUI';
+import { getColor } from '../../constants/constants';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -57,6 +58,7 @@ const WorkspaceInfo = React.memo(function WI(props: { title: string }) {
 
   function handleClose(value: string) {
     if (value !== '' && !courses.includes(value)) {
+      localStorage.setItem(value, getColor(courses.length));
       dispatch(showSuccess(`Added course ${value} to the current workspace`));
       dispatch(addCourse(value));
     } else {

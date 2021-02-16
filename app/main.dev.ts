@@ -18,7 +18,6 @@ import installExtension, {
   REDUX_DEVTOOLS,
   REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer';
-import MenuBuilder from './menu';
 import { SnackbarSeverity } from './interfaces';
 
 const fs = require('fs');
@@ -268,9 +267,6 @@ const createWindow = async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
 
   mainWindow.removeMenu();
 

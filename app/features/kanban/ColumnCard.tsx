@@ -12,17 +12,18 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import IconButton from '@material-ui/core/IconButton';
 import { ColumnDivProps } from '../../types';
 import ItemCard from './ItemCard';
+import { getListStyle, getColStyle } from './utils';
 
 const useStyles = makeStyles(() =>
   createStyles({
     col: {
       display: 'flex',
       flexDirection: 'column',
-      maxHeight: '60vh',
+      maxHeight: '70vh',
       backgroundColor: 'rgb(235,236,240)',
       margin: '20px',
       borderRadius: '5px',
-      minWidth: '15vw',
+      minWidth: '18vw',
     },
     coltitle: {
       display: 'flex',
@@ -35,8 +36,8 @@ const useStyles = makeStyles(() =>
     },
     containerparent: {
       minWidth: '87%',
-      minHeight: '60vh',
-      maxHeight: '60vh',
+      minHeight: '70vh',
+      maxHeight: '70vh',
       overflow: 'hidden',
       position: 'relative',
       padding: '10px',
@@ -62,19 +63,6 @@ const useStyles = makeStyles(() =>
     },
   })
 );
-
-const getListStyle = (isDraggingOver) => ({
-  background: isDraggingOver ? 'lightblue' : 'rgb(235,236,240)',
-});
-
-const getColStyle = (isDragging, draggableStyle) => ({
-  userSelect: 'none',
-
-  backgroundColor: isDragging ? 'green' : '#FFCF99',
-
-  // styles we need to apply on draggables
-  ...draggableStyle,
-});
 
 const ColumnCard = (props: ColumnDivProps) => {
   const { name, entries, addE, removeC, index, openCardInfo, removeE } = props;
@@ -123,6 +111,7 @@ const ColumnCard = (props: ColumnDivProps) => {
                               label={ob.split(',')[4]}
                               duedate={ob.split(',')[5]}
                               belongsto={ob.split(',')[6]}
+                              completed={ob.split(',')[7]}
                               index={i2}
                               openCardInfo={openCardInfo}
                               removeE={removeE}
