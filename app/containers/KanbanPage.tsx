@@ -51,14 +51,7 @@ export default function KanbanPage() {
         <div>{workspace !== '' ? <Loader /> : <EmptyPage />}</div>
       ) : (
         <div style={{ overflow: 'hidden' }}>
-          <ScrollContainer
-            className="scroll-container"
-            horizontal
-            hideScrollbars
-            vertical={false}
-          >
-            <Kanban />
-          </ScrollContainer>
+          <Kanban />
         </div>
       )}
     </div>

@@ -2,13 +2,13 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
-@import url('https://fonts.googleapis.com/css2?family=Redressed&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Redressed&family=Roboto&display=swap');
 
 body {
   position: relative;
   color: white;
   height: 100vh;
-  font-family: Arial, Helvetica, Helvetica Neue, serif;
+  font-family: Roboto, Arial, Helvetica, Helvetica Neue, serif;
   background-image: url('https://source.unsplash.com/random/1980x1080');
   background-repeat: no-repeat;
   background-size: cover;
@@ -42,4 +42,8 @@ a:hover {
   opacity: 1;
   text-decoration: none;
   cursor: pointer;
+}
+
+.window-title {
+  color: '#1B1E2B';
 }

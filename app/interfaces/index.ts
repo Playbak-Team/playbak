@@ -65,6 +65,7 @@ interface Events {
   label: string;
   duedate: string;
   belongsto: string;
+  completed: number;
 }
 
 enum SnackbarSeverity {

@@ -22,7 +22,7 @@ const mapEntries = async (entries) => {
       (v) =>
         `(?,"${v.split(',')[1]}","${v.split(',')[2]}","${v.split(',')[3]}","${
           v.split(',')[4]
-        }","${v.split(',')[5]}","${v.split(',')[6]}")`
+        }","${v.split(',')[5]}","${v.split(',')[6]}",${v.split(',')[7]})`
     )
   );
 };

@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import Button from '@material-ui/core/Button';
@@ -10,7 +10,12 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
+import SettingsIcon from '@material-ui/icons/Settings';
+import IconButton from '@material-ui/core/IconButton/IconButton';
+import ScrollContainer from 'react-indiana-drag-scroll';
+import { RowDiv } from './styledComponents';
 import { DragProps } from '../../types';
+import SettingsDialog from './SettingsDialog';
 import {
   getColumnNames,
   getEntries,
@@ -24,6 +29,7 @@ import {
 } from './kanbanSlice';
 import EditEntry from './EditEntry';
 import ColumnCard from './ColumnCard';
+import { move, reorder } from './utils';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -31,56 +37,28 @@ const useStyles = makeStyles(() =>
       width: 'max-content',
       minWidth: '100%',
       height: '100vh',
-      backgroundColor: 'rgb(38, 132, 255)',
+      backgroundColor: 'transparent',
       display: 'flex',
       flexDirection: 'row',
     },
     page: {
       display: 'flex',
       flexDirection: 'column',
-      backgroundColor: 'rgb(38, 132, 255)',
-      width: 'max-content',
+      backgroundColor: '#010203',
+      backgroundImage: `radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 10px),
+      radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+      radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 10px),
+      radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 5px)`,
+      backgroundSize: '550px 550px, 350px 350px, 250px 250px, 150px 150px',
       minWidth: '100%',
     },
   })
 );
 
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-
-  return result;
-};
-
-const move = (
-  sourceString,
-  destinationString,
-  source,
-  destination,
-  droppableSource,
-  droppableDestination
-) => {
-  const sourceClone = Array.from(source);
-  const destClone = Array.from(destination);
-  const [removed]: any = sourceClone.splice(droppableSource.index, 1);
-
-  const ind = removed.lastIndexOf(sourceString);
-
-  const [ret] = [removed.substring(0, ind) + destinationString];
-
-  destClone.splice(droppableDestination.index, 0, ret);
-
-  const result = {};
-  result[droppableSource.droppableId] = sourceClone;
-  result[droppableDestination.droppableId] = destClone;
-
-  return result;
-};
-
 export default function KanBan() {
   const [items, setItems] = useState<Map<string, string[]>>(new Map());
   const [open, setOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [colName, setColName] = useState('');
 
   const [selectedEntry, setSelectedEntry] = useState(-1);
@@ -93,7 +71,10 @@ export default function KanBan() {
 
   function addE(name: string) {
     const nextId = entries.length + 1;
-    const toAdd = `${nextId},DefaultTitle,DefaultSub,DefaultDesc,DefaultLabel,Dec 30 2020,${name}`;
+    const d = new Date();
+    const toAdd = `${nextId},DefaultTitle,DefaultSub,DefaultDesc,Other,${d.getFullYear()}-${`${
+      d.getMonth() + 1
+    }`.padStart(2, '0')}-${d.getDate()}T12:00,${name},${0}`;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const tmp: string[] = items.get(name)!;
     setItems(new Map(items.set(name, tmp.concat([toAdd]))));
@@ -122,9 +103,17 @@ export default function KanBan() {
     setShowSelectedEntry(true);
   }
 
-  const handleClickOpen = () => {
+  const handleClickOpen = useCallback(() => {
     setOpen(true);
-  };
+  }, []);
+
+  const handleSettingsClickOpen = useCallback(() => {
+    setSettingsOpen(true);
+  }, []);
+
+  const handleSettingsClose = useCallback(() => {
+    setSettingsOpen(false);
+  }, []);
 
   const handleClose = () => {
     setColName('');
@@ -184,7 +173,6 @@ export default function KanBan() {
           source,
           destination
         );
-
         const tmp = items;
         tmp.set(sInd, res[sInd]);
         tmp.set(dInd, res[dInd]);
@@ -201,21 +189,62 @@ export default function KanBan() {
 
   return (
     <div className={classes.page}>
-      <Button
-        variant="contained"
-        color="primary"
-        style={{
-          margin: '10px',
-          maxWidth: 'max-content',
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-start',
-        }}
-        onClick={handleClickOpen}
+      <RowDiv style={{ color: 'white' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          style={{
+            margin: '10px',
+            maxWidth: 'max-content',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+          }}
+          onClick={handleClickOpen}
+        >
+          <AddCircleIcon style={{ marginRight: '10px' }} />
+          Add another column
+        </Button>
+        <IconButton
+          color="inherit"
+          size="small"
+          onClick={handleSettingsClickOpen}
+        >
+          <SettingsIcon />
+        </IconButton>
+      </RowDiv>
+      <ScrollContainer
+        className="scroll-container"
+        horizontal
+        hideScrollbars
+        vertical={false}
       >
-        <AddCircleIcon style={{ marginRight: '10px' }} />
-        Add another column
-      </Button>
+        <DragDropContext id="le-board" onDragEnd={onDragEnd}>
+          <Droppable droppableId="board" type="COLS" direction="horizontal">
+            {(provided) => (
+              <div
+                className={classes.root}
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {columns.map((c, index) => (
+                  <ColumnCard
+                    key={c}
+                    name={c}
+                    entries={items.get(c)}
+                    addE={addE}
+                    removeC={removeC}
+                    index={index}
+                    openCardInfo={openCardInfo}
+                    removeE={removeE}
+                  />
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </ScrollContainer>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -242,37 +271,16 @@ export default function KanBan() {
           </Button>
         </DialogActions>
       </Dialog>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="board" type="COLS" direction="horizontal">
-          {(provided) => (
-            <div
-              className={classes.root}
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              {columns.map((c, index) => (
-                <ColumnCard
-                  key={c}
-                  name={c}
-                  entries={items.get(c)}
-                  addE={addE}
-                  removeC={removeC}
-                  index={index}
-                  openCardInfo={openCardInfo}
-                  removeE={removeE}
-                />
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
       <EditEntry
         index={selectedEntry}
         entry={selectedEntry !== -1 ? entries[selectedEntry] : ''}
         handleEntryClose={handleEntryClose}
         showSelectedEntry={showSelectedEntry}
         handleEntrySave={handleEntrySave}
+      />
+      <SettingsDialog
+        showSettings={settingsOpen}
+        handleSettingsClose={handleSettingsClose}
       />
     </div>
   );
